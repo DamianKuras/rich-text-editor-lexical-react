@@ -5,9 +5,14 @@ import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 
 import { EditorTheme } from "./EditorTheme";
+import {
+  getSavedStateFromLocalStorage,
+  LocalStoragePlugin,
+} from "./plugins/LocalStoragePlugin";
 
 export function Editor() {
   const initialConfig = {
+    editorState: getSavedStateFromLocalStorage(),
     namespace: "rich-text-editor",
     theme: EditorTheme,
     onError(error: Error) {
@@ -33,6 +38,7 @@ export function Editor() {
         </div>
 
         <HistoryPlugin />
+        <LocalStoragePlugin />
       </LexicalComposer>
     </div>
   );
