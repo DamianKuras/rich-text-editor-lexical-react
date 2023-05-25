@@ -6,7 +6,7 @@ export const EditorTheme = {
     bold: "font-bold",
     italic: "italic",
     strikethrough: "line-through",
-    underline: "underline decoration-wavy",
-    underlineStrikethrough: "underline decoration-wavy line-through",
+    underline: "underline",
+    underlineStrikethrough: "custom-underline-strikethrough",
   },
 };
