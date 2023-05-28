@@ -41,12 +41,14 @@ import {
 } from "react-icons/fa";
 import { MdInsertPageBreak } from "react-icons/md";
 
+import { BlockType } from "../index";
 import {
   FAILED_TO_SAVE_TO_LOCAL_STORAGE,
   SAVED_SUCCESSFULLY_TO_LOCAL_STORAGE,
   SAVE_TO_LOCAL_STORAGE,
 } from "../plugins/LocalStoragePlugin";
 import { ToolbarButton } from "../ui/ToolbarButton";
+import { BlockFormatDropDown } from "./BlockFormatDropDown";
 
 export function ToolbarPlugin(): JSX.Element {
   const [editor] = useLexicalComposerContext();
@@ -64,6 +66,7 @@ export function ToolbarPlugin(): JSX.Element {
   const [isSubscript, setIsSubscript] = useState(false);
   const [isSuperscript, setIsSuperscript] = useState(false);
 
+  const [selectedBlockType] = useState<BlockType>("paragraph");
   useEffect(() => {
     return mergeRegister(
       editor.registerUpdateListener(({ dirtyElements, dirtyLeaves }) => {
@@ -196,6 +199,14 @@ export function ToolbarPlugin(): JSX.Element {
             >
               <FaRedo />
             </ToolbarButton>
+          </div>
+          <div className="flex min-w-[8em] justify-center border-r px-1">
+            <div className="my-auto">
+              <BlockFormatDropDown
+                editor={editor}
+                selectedBlockType={selectedBlockType}
+              />
+            </div>
           </div>
           <div className="border-r px-2">
             <ToolbarButton

@@ -1,16 +1,29 @@
+import { ListItemNode, ListNode } from "@lexical/list";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { HorizontalRuleNode } from "@lexical/react/LexicalHorizontalRuleNode";
 import { HorizontalRulePlugin } from "@lexical/react/LexicalHorizontalRulePlugin";
+import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+import { HeadingNode, QuoteNode } from "@lexical/rich-text";
 import { EditorTheme } from "./EditorTheme";
-import {
-  getSavedStateFromLocalStorage,
-  LocalStoragePlugin,
-} from "./plugins/LocalStoragePlugin";
 import { ToolbarPlugin } from "./Toolbar";
+
+import {
+  LocalStoragePlugin,
+  getSavedStateFromLocalStorage,
+} from "./plugins/LocalStoragePlugin";
+
+export type BlockType =
+  | "paragraph"
+  | "h1"
+  | "h2"
+  | "h3"
+  | "bullet"
+  | "number"
+  | "quote";
 
 export function Editor() {
   const initialConfig = {
@@ -20,7 +33,7 @@ export function Editor() {
     onError(error: Error) {
       console.log(error);
     },
-    nodes: [HorizontalRuleNode],
+    nodes: [HeadingNode, ListNode, ListItemNode, QuoteNode, HorizontalRuleNode],
   };
 
   return (
@@ -43,6 +56,7 @@ export function Editor() {
 
         <HistoryPlugin />
         <HorizontalRulePlugin />
+        <ListPlugin />
         <LocalStoragePlugin />
       </LexicalComposer>
     </div>
