@@ -1,9 +1,16 @@
+import { $isListNode, ListNode } from "@lexical/list";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { INSERT_HORIZONTAL_RULE_COMMAND } from "@lexical/react/LexicalHorizontalRuleNode";
-import { mergeRegister } from "@lexical/utils";
+import { $isHeadingNode } from "@lexical/rich-text";
+import {
+  $findMatchingParent,
+  $getNearestNodeOfType,
+  mergeRegister,
+} from "@lexical/utils";
 import {
   $getSelection,
   $isRangeSelection,
+  $isRootOrShadowRoot,
   CAN_REDO_COMMAND,
   CAN_UNDO_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
@@ -19,7 +26,7 @@ import {
   UNDO_COMMAND,
 } from "lexical";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { IconContext } from "react-icons";
 import {
@@ -66,7 +73,9 @@ export function ToolbarPlugin(): JSX.Element {
   const [isSubscript, setIsSubscript] = useState(false);
   const [isSuperscript, setIsSuperscript] = useState(false);
 
-  const [selectedBlockType] = useState<BlockType>("paragraph");
+  const [selectedBlockType, setSelectedBlockType] =
+    useState<BlockType>("paragraph");
+
   useEffect(() => {
     return mergeRegister(
       editor.registerUpdateListener(({ dirtyElements, dirtyLeaves }) => {
@@ -132,9 +141,43 @@ export function ToolbarPlugin(): JSX.Element {
     );
   }, [editor]);
 
-  function updateToolbarSelections() {
+  const updateToolbarSelections = useCallback(() => {
     const selection = $getSelection();
     if ($isRangeSelection(selection)) {
+      const anchorNode = selection.anchor.getNode();
+      let element =
+        anchorNode.getKey() === "root"
+          ? anchorNode
+          : $findMatchingParent(anchorNode, (e) => {
+              const parent = e.getParent();
+              return parent !== null && $isRootOrShadowRoot(parent);
+            });
+
+      if (element === null) {
+        element = anchorNode.getTopLevelElementOrThrow();
+      }
+
+      const elementKey = element.getKey();
+      const elementDOM = editor.getElementByKey(elementKey);
+      if (elementDOM !== null) {
+        if ($isListNode(element)) {
+          const parentList = $getNearestNodeOfType<ListNode>(
+            anchorNode,
+            ListNode
+          );
+          const type = parentList
+            ? parentList.getListType()
+            : element.getListType();
+          setSelectedBlockType(type as BlockType);
+        } else {
+          const type = $isHeadingNode(element)
+            ? element.getTag()
+            : element.getType();
+          if (type) {
+            setSelectedBlockType(type);
+          }
+        }
+      }
       setIsBold(selection.hasFormat("bold"));
       setIsItalic(selection.hasFormat("italic"));
       setIsUnderline(selection.hasFormat("underline"));
@@ -142,7 +185,7 @@ export function ToolbarPlugin(): JSX.Element {
       setIsSubscript(selection.hasFormat("subscript"));
       setIsSuperscript(selection.hasFormat("superscript"));
     }
-  }
+  }, [editor]);
 
   const handleUndo = () => {
     editor.dispatchCommand(UNDO_COMMAND, undefined);
