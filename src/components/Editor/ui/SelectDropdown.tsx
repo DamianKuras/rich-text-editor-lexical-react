@@ -27,8 +27,8 @@ export function SelectDropdown<T extends React.Key>({
   selectedItemKey,
   defaultItemKey,
 }: SelectDropdownProps<T>): JSX.Element {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -39,21 +39,21 @@ export function SelectDropdown<T extends React.Key>({
     onSelect(dropDownItemKey);
   };
 
-  const handleClickOutside = (event: ClickOrTouchEvent) => {
-    if (
-      dropdownRef.current &&
-      !dropdownRef.current.contains(event.target as Node)
-    ) {
-      setIsDropdownOpen(false);
-    }
-  };
-
   useEffect(() => {
+    const handleClickOutside = (event: ClickOrTouchEvent) => {
+      if (
+        dropdownRef.current &&
+        isDropdownOpen &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsDropdownOpen(false);
+      }
+    };
     window.addEventListener("click", handleClickOutside);
     return () => {
       window.removeEventListener("click", handleClickOutside);
     };
-  }, []);
+  }, [isDropdownOpen]);
 
   const selectedItem = dropDownItems.get(selectedItemKey);
   const defaultItem = dropDownItems.get(defaultItemKey);
