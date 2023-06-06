@@ -1,17 +1,16 @@
 import { createContext } from "react";
 
 interface SettingsContextProps {
-  AutoSaveEnabled: boolean;
-  AutoSaveInterval: number;
+  autoSaveEnabled: boolean;
+  autoSaveInterval: number;
   setAutoSaveEnabled: (enabled: boolean) => void;
   setAutoSaveInterval: (interval: number) => void;
 }
 const defaultValues: SettingsContextProps = {
-  AutoSaveEnabled: false,
-  AutoSaveInterval: 3,
+  autoSaveEnabled: false,
+  autoSaveInterval: 3000,
   setAutoSaveEnabled: () => undefined,
   setAutoSaveInterval: () => undefined,
 };
-export const SettingsContext = createContext<SettingsContextProps>(
-    defaultValues
-);
+export const SettingsContext =
+  createContext<SettingsContextProps>(defaultValues);

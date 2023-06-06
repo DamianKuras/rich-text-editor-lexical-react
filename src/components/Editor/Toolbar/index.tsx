@@ -56,6 +56,7 @@ import {
 } from "../plugins/LocalStoragePlugin";
 import { ToolbarButton } from "../ui/ToolbarButton";
 import { BlockFormatDropDown } from "./BlockFormatDropDown";
+import { SettingsDropdown } from "./SettingsDropdown";
 
 export function ToolbarPlugin(): JSX.Element {
   const [editor] = useLexicalComposerContext();
@@ -228,6 +229,10 @@ export function ToolbarPlugin(): JSX.Element {
       >
         <div className="flex">
           <div className="border-r px-2">
+            <SettingsDropdown />
+          </div>
+
+          <div className="border-r px-2">
             <ToolbarButton
               title="Undo (Ctrl+z)"
               disabled={!canUndo}
@@ -279,10 +284,16 @@ export function ToolbarPlugin(): JSX.Element {
             >
               <FaAlignJustify />
             </ToolbarButton>
-            <ToolbarButton title="Indent" onClick={() => handleIndent()}>
+            <ToolbarButton
+              title="Indent"
+              onClick={() => handleIndent()}
+            >
               <FaIndent />
             </ToolbarButton>
-            <ToolbarButton title="Outdent" onClick={() => handleOutdent()}>
+            <ToolbarButton
+              title="Outdent"
+              onClick={() => handleOutdent()}
+            >
               <FaOutdent />
             </ToolbarButton>
           </div>
@@ -330,7 +341,7 @@ export function ToolbarPlugin(): JSX.Element {
               <FaSuperscript />
             </ToolbarButton>
           </div>
-          <div className="px-2">
+          <div className="flex px-2">
             <ToolbarButton
               title="Insert horizontal rule"
               onClick={() => handleInsertHorizontalRule()}

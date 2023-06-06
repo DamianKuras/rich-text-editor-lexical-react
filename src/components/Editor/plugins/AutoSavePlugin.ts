@@ -33,8 +33,7 @@ export function AutoSavePlugin({
         clearInterval(saveTimerRef.current);
       }
     };
-  }, [editor,handleSave, AutoSaveEnabled, AutoSaveInterval]);
-
+  }, [editor, handleSave, AutoSaveEnabled, AutoSaveInterval]);
 
   useEffect(() => {
     return editor.registerUpdateListener(({ dirtyElements, dirtyLeaves }) => {

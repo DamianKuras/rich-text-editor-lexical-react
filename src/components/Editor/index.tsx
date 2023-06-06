@@ -39,14 +39,16 @@ export function Editor() {
     },
     nodes: [HeadingNode, ListNode, ListItemNode, QuoteNode, HorizontalRuleNode],
   };
-  const [autoSaveEnabled, setAutoSaveEnabled] = useState(false);
-  const [autoSaveInterval, setAutoSaveInterval] = useState(3);
+
+  const [autoSaveEnabled, setAutoSaveEnabled] = useState(true);
+  const [autoSaveInterval, setAutoSaveInterval] = useState(3000);
+
   return (
-    <div className="w-full max-w-5xl mx-auto">
+    <div className="mx-auto w-full max-w-5xl">
       <SettingsContext.Provider
         value={{
-          AutoSaveEnabled: autoSaveEnabled,
-          AutoSaveInterval: autoSaveInterval,
+          autoSaveEnabled: autoSaveEnabled,
+          autoSaveInterval: autoSaveInterval,
           setAutoSaveEnabled,
           setAutoSaveInterval,
         }}
@@ -59,7 +61,7 @@ export function Editor() {
                 <ContentEditable className="px-8 py-8 text-editor-text focus:outline-none" />
               }
               placeholder={
-                <div className="absolute pointer-events-none select-none text-disabled left-8 top-8">
+                <div className="text-disabled pointer-events-none absolute left-8 top-8 select-none">
                   Enter some text...
                 </div>
               }
