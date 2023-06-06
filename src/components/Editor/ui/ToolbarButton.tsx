@@ -24,7 +24,7 @@ export function ToolbarButton({
       onClick={onClick}
       className={`${className ? className + " " : ""}px-2 pb-2 pt-1 ${
         disabled
-          ? "[&>svg]:text-toolbar-disabled cursor-not-allowed"
+          ? "cursor-not-allowed [&>svg]:text-toolbar-disabled"
           : "hover:bg-toolbar-hover"
       } ${clicked ? "bg-toolbar-clicked" : ""}`}
       disabled={disabled}

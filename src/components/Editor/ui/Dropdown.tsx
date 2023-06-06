@@ -37,7 +37,11 @@ export function Dropdown({
   }, [isDropdownOpen]);
   return (
     <div ref={dropdownRef}>
-      <ToolbarButton title={dropdownTitle} onClick={toggleDropdown}>
+      <ToolbarButton
+        title={dropdownTitle}
+        onClick={toggleDropdown}
+        clicked={isDropdownOpen}
+      >
         {buttonContent}
       </ToolbarButton>
 
