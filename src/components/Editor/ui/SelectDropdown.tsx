@@ -1,5 +1,4 @@
 import React, { ReactNode, useEffect, useRef, useState } from "react";
-
 import { IoMdArrowDropdown } from "react-icons/io";
 
 export interface DropdownItem<T extends React.Key> {
@@ -17,7 +16,7 @@ interface SelectDropdownProps<T extends React.Key> {
 
 type ClickOrTouchEvent = MouseEvent | TouchEvent;
 
-function useMapToArray<T>(map: Map<T, any>): any[] {
+function useMapToArray<T, U>(map: Map<T, U>): U[] {
   return React.useMemo(() => Array.from(map.values()), [map]);
 }
 
@@ -78,7 +77,7 @@ export function SelectDropdown<T extends React.Key>({
             {dropDownItemsArray.map((dropDownItem: DropdownItem<T>) => (
               <div
                 key={dropDownItem.key}
-                className="cursor-pointer px-2 py-2 text-toolbar-text hover:bg-toolbar-hover"
+                className="cursor-pointer px-2 py-1 text-toolbar-text hover:bg-toolbar-hover"
                 onClick={() => handleDropdownItemSelection(dropDownItem.key)}
               >
                 {dropDownItem.dropDownLabel}

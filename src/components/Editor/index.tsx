@@ -1,3 +1,4 @@
+import { CodeHighlightNode, CodeNode } from "@lexical/code";
 import { ListItemNode, ListNode } from "@lexical/list";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
@@ -7,13 +8,14 @@ import { HorizontalRuleNode } from "@lexical/react/LexicalHorizontalRuleNode";
 import { HorizontalRulePlugin } from "@lexical/react/LexicalHorizontalRulePlugin";
 import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+import { TabIndentationPlugin } from "@lexical/react/LexicalTabIndentationPlugin";
 import { HeadingNode, QuoteNode } from "@lexical/rich-text";
+import { useState } from "react";
 import { EditorTheme } from "./EditorTheme";
 import { ToolbarPlugin } from "./Toolbar";
-
-import { useState } from "react";
 import { SettingsContext } from "./context/SettingsContext";
 import { AutoSavePlugin } from "./plugins/AutoSavePlugin";
+import CodeHighlightPlugin from "./plugins/CodeHighlightPlugin";
 import {
   LocalStoragePlugin,
   SAVE_TO_LOCAL_STORAGE,
@@ -27,7 +29,8 @@ export type BlockType =
   | "h3"
   | "bullet"
   | "number"
-  | "quote";
+  | "quote"
+  | "code";
 
 export function Editor() {
   const initialConfig = {
@@ -37,7 +40,15 @@ export function Editor() {
     onError(error: Error) {
       console.log(error);
     },
-    nodes: [HeadingNode, ListNode, ListItemNode, QuoteNode, HorizontalRuleNode],
+    nodes: [
+      HeadingNode,
+      ListNode,
+      ListItemNode,
+      QuoteNode,
+      HorizontalRuleNode,
+      CodeHighlightNode,
+      CodeNode,
+    ],
   };
 
   const [autoSaveEnabled, setAutoSaveEnabled] = useState(true);
@@ -61,7 +72,7 @@ export function Editor() {
                 <ContentEditable className="px-8 py-8 text-editor-text focus:outline-none" />
               }
               placeholder={
-                <div className="text-disabled pointer-events-none absolute left-8 top-8 select-none">
+                <div className="pointer-events-none absolute left-8 top-8 select-none text-disabled">
                   Enter some text...
                 </div>
               }
@@ -73,6 +84,8 @@ export function Editor() {
           <HorizontalRulePlugin />
           <ListPlugin />
           <LocalStoragePlugin />
+          <CodeHighlightPlugin />
+          <TabIndentationPlugin />
           <AutoSavePlugin
             SaveCommand={SAVE_TO_LOCAL_STORAGE}
             AutoSaveEnabled={autoSaveEnabled}
