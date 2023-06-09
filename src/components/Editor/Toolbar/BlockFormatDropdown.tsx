@@ -1,3 +1,4 @@
+import { $createCodeNode } from "@lexical/code";
 import {
   INSERT_ORDERED_LIST_COMMAND,
   INSERT_UNORDERED_LIST_COMMAND,
@@ -14,7 +15,6 @@ import {
   $isRangeSelection,
   LexicalEditor,
 } from "lexical";
-
 import { BlockType } from "../index";
 import { DropdownItem, SelectDropdown } from "../ui/SelectDropdown";
 
@@ -122,19 +122,44 @@ const dropDownItems: Map<BlockType, BlockFormatDropdownItem> = new Map([
       },
     },
   ],
+  [
+    "code",
+    {
+      selectedLabel: "Code",
+      dropDownLabel: <span>&lt;code&gt;</span>,
+      key: "code",
+      formatHandler: (editor: LexicalEditor) => {
+        editor.update(() => {
+          let selection = $getSelection();
+          if ($isRangeSelection(selection)) {
+            if (selection.isCollapsed()) {
+              $setBlocksType(selection, () => $createCodeNode());
+            } else {
+              const textContent = selection.getTextContent();
+              const codeNode = $createCodeNode();
+              selection.insertNodes([codeNode]);
+              selection = $getSelection();
+              if ($isRangeSelection(selection))
+                selection.insertRawText(textContent);
+            }
+          }
+        });
+      },
+    },
+  ],
 ]);
 
-interface BlockLevelFormatDropDownProps {
+interface BlockLevelFormatDropdownProps {
   editor: LexicalEditor;
   selectedBlockType: BlockType;
 }
 
-export function BlockFormatDropDown({
+export function BlockFormatDropdown({
   editor,
   selectedBlockType,
-}: BlockLevelFormatDropDownProps): JSX.Element {
+}: BlockLevelFormatDropdownProps): JSX.Element {
   const handleBlockFormatDropdownItemSelection = (type: BlockType) => {
-    if (selectedBlockType == type) {
+    if (selectedBlockType === type) {
       return;
     }
     dropDownItems.get(type)?.formatHandler(editor);

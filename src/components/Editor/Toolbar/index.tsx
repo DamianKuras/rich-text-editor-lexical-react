@@ -1,3 +1,4 @@
+import { $isCodeNode, CODE_LANGUAGE_MAP } from "@lexical/code";
 import { $isListNode, ListNode } from "@lexical/list";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { INSERT_HORIZONTAL_RULE_COMMAND } from "@lexical/react/LexicalHorizontalRuleNode";
@@ -8,6 +9,7 @@ import {
   mergeRegister,
 } from "@lexical/utils";
 import {
+  $getNodeByKey,
   $getSelection,
   $isRangeSelection,
   $isRootOrShadowRoot,
@@ -19,15 +21,14 @@ import {
   FORMAT_ELEMENT_COMMAND,
   FORMAT_TEXT_COMMAND,
   INDENT_CONTENT_COMMAND,
+  NodeKey,
   OUTDENT_CONTENT_COMMAND,
   REDO_COMMAND,
   SELECTION_CHANGE_COMMAND,
   TextFormatType,
   UNDO_COMMAND,
 } from "lexical";
-
 import { useCallback, useEffect, useState } from "react";
-
 import { IconContext } from "react-icons";
 import {
   FaAlignCenter,
@@ -47,7 +48,6 @@ import {
   FaUndo,
 } from "react-icons/fa";
 import { MdInsertPageBreak } from "react-icons/md";
-
 import { BlockType } from "../index";
 import {
   FAILED_TO_SAVE_TO_LOCAL_STORAGE,
@@ -55,7 +55,8 @@ import {
   SAVE_TO_LOCAL_STORAGE,
 } from "../plugins/LocalStoragePlugin";
 import { ToolbarButton } from "../ui/ToolbarButton";
-import { BlockFormatDropDown } from "./BlockFormatDropDown";
+import { BlockFormatDropdown } from "./BlockFormatDropdown";
+import { CodeLanguageDropdown } from "./CodeLanguageDropdown";
 import { SettingsDropdown } from "./SettingsDropdown";
 
 export function ToolbarPlugin(): JSX.Element {
@@ -66,14 +67,16 @@ export function ToolbarPlugin(): JSX.Element {
   });
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
-
+  const [selectedElementKey, setSelectedElementKey] = useState<NodeKey | null>(
+    null
+  );
   const [isBold, setIsBold] = useState(false);
   const [isItalic, setIsItalic] = useState(false);
   const [isUnderline, setIsUnderline] = useState(false);
   const [isStrikethrough, setIsStrikethrough] = useState(false);
   const [isSubscript, setIsSubscript] = useState(false);
   const [isSuperscript, setIsSuperscript] = useState(false);
-
+  const [codeLanguage, setCodeLanguage] = useState<string>("");
   const [selectedBlockType, setSelectedBlockType] =
     useState<BlockType>("paragraph");
 
@@ -96,6 +99,7 @@ export function ToolbarPlugin(): JSX.Element {
       const elementKey = element.getKey();
       const elementDOM = editor.getElementByKey(elementKey);
       if (elementDOM !== null) {
+        setSelectedElementKey(elementKey);
         if ($isListNode(element)) {
           const parentList = $getNearestNodeOfType<ListNode>(
             anchorNode,
@@ -112,6 +116,14 @@ export function ToolbarPlugin(): JSX.Element {
           if (type) {
             setSelectedBlockType(type);
           }
+        }
+        if ($isCodeNode(element)) {
+          const language =
+            element.getLanguage() as keyof typeof CODE_LANGUAGE_MAP;
+          setCodeLanguage(
+            language ? CODE_LANGUAGE_MAP[language] || language : ""
+          );
+          return;
         }
       }
       setIsBold(selection.hasFormat("bold"));
@@ -200,6 +212,20 @@ export function ToolbarPlugin(): JSX.Element {
     editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, element);
   };
 
+  const handleCodeLangugeChange = useCallback(
+    (value: string) => {
+      editor.update(() => {
+        if (selectedElementKey !== null) {
+          const node = $getNodeByKey(selectedElementKey);
+          if ($isCodeNode(node)) {
+            node.setLanguage(value);
+          }
+        }
+      });
+    },
+    [editor, selectedElementKey]
+  );
+
   const handleIndent = () => {
     editor.dispatchCommand(INDENT_CONTENT_COMMAND, undefined);
   };
@@ -250,12 +276,23 @@ export function ToolbarPlugin(): JSX.Element {
           </div>
           <div className="flex min-w-[8em] justify-center border-r px-1">
             <div className="my-auto">
-              <BlockFormatDropDown
+              <BlockFormatDropdown
                 editor={editor}
                 selectedBlockType={selectedBlockType}
               />
             </div>
           </div>
+          {selectedBlockType === "code" && (
+            <div className="flex min-w-[8em] justify-center border-r px-1">
+              <div className="my-auto">
+                <CodeLanguageDropdown
+                  onCodeLanguageChange={handleCodeLangugeChange}
+                  selectedCodeLanguage={codeLanguage}
+                />
+              </div>
+            </div>
+          )}
+
           <div className="border-r px-2">
             <ToolbarButton
               title="Align left"
@@ -297,58 +334,68 @@ export function ToolbarPlugin(): JSX.Element {
               <FaOutdent />
             </ToolbarButton>
           </div>
-          <div className="border-r px-2">
-            <ToolbarButton
-              title="Bold"
-              clicked={isBold}
-              onClick={() => handleFormatText("bold")}
-            >
-              <FaBold />
-            </ToolbarButton>
-            <ToolbarButton
-              title="Italic"
-              clicked={isItalic}
-              onClick={() => handleFormatText("italic")}
-            >
-              <FaItalic />
-            </ToolbarButton>
-            <ToolbarButton
-              title="Underline"
-              clicked={isUnderline}
-              onClick={() => handleFormatText("underline")}
-            >
-              <FaUnderline />
-            </ToolbarButton>
-            <ToolbarButton
-              title="striketrough"
-              clicked={isStrikethrough}
-              onClick={() => handleFormatText("strikethrough")}
-            >
-              <FaStrikethrough />
-            </ToolbarButton>
-            <ToolbarButton
-              title="Subscript"
-              clicked={isSubscript}
-              onClick={() => handleFormatText("subscript")}
-            >
-              <FaSubscript />
-            </ToolbarButton>
-            <ToolbarButton
-              title="Superscript"
-              clicked={isSuperscript}
-              onClick={() => handleFormatText("superscript")}
-            >
-              <FaSuperscript />
-            </ToolbarButton>
-          </div>
-          <div className="flex px-2">
-            <ToolbarButton
-              title="Insert horizontal rule"
-              onClick={() => handleInsertHorizontalRule()}
-            >
-              <MdInsertPageBreak />
-            </ToolbarButton>
-          </div>
+          {(selectedBlockType === "paragraph" ||
+            selectedBlockType === "h1" ||
+            selectedBlockType === "h2" ||
+            selectedBlockType === "h3" ||
+            selectedBlockType === "bullet" ||
+            selectedBlockType === "number" ||
+            selectedBlockType === "quote") && (
+            <>
+              <div className="border-r px-2">
+                <ToolbarButton
+                  title="Bold"
+                  clicked={isBold}
+                  onClick={() => handleFormatText("bold")}
+                >
+                  <FaBold />
+                </ToolbarButton>
+                <ToolbarButton
+                  title="Italic"
+                  clicked={isItalic}
+                  onClick={() => handleFormatText("italic")}
+                >
+                  <FaItalic />
+                </ToolbarButton>
+                <ToolbarButton
+                  title="Underline"
+                  clicked={isUnderline}
+                  onClick={() => handleFormatText("underline")}
+                >
+                  <FaUnderline />
+                </ToolbarButton>
+                <ToolbarButton
+                  title="striketrough"
+                  clicked={isStrikethrough}
+                  onClick={() => handleFormatText("strikethrough")}
+                >
+                  <FaStrikethrough />
+                </ToolbarButton>
+                <ToolbarButton
+                  title="Subscript"
+                  clicked={isSubscript}
+                  onClick={() => handleFormatText("subscript")}
+                >
+                  <FaSubscript />
+                </ToolbarButton>
+                <ToolbarButton
+                  title="Superscript"
+                  clicked={isSuperscript}
+                  onClick={() => handleFormatText("superscript")}
+                >
+                  <FaSuperscript />
+                </ToolbarButton>
+              </div>
+              <div className="flex px-2">
+                <ToolbarButton
+                  title="Insert horizontal rule"
+                  onClick={() => handleInsertHorizontalRule()}
+                >
+                  <MdInsertPageBreak />
+                </ToolbarButton>
+              </div>
+            </>
+          )}
         </div>
 
         <div className="inline-flex items-center justify-center">
