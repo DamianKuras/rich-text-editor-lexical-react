@@ -59,6 +59,7 @@ export default {
         "code-highlight-tag": "#FF6E87",
         "code-highlight-url": "#6BB7FF",
         "code-highlight-variable": "#F5F5F5",
+        link: "#8ab4f8",
       },
     },
   },

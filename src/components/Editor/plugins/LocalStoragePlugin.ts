@@ -1,6 +1,5 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { COMMAND_PRIORITY_LOW, LexicalCommand, createCommand } from "lexical";
-
 import { useEffect } from "react";
 
 export const SAVE_TO_LOCAL_STORAGE: LexicalCommand<void> = createCommand();

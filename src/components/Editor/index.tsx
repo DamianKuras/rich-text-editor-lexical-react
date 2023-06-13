@@ -1,4 +1,5 @@
 import { CodeHighlightNode, CodeNode } from "@lexical/code";
+import { LinkNode } from "@lexical/link";
 import { ListItemNode, ListNode } from "@lexical/list";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
@@ -16,6 +17,8 @@ import { ToolbarPlugin } from "./Toolbar";
 import { SettingsContext } from "./context/SettingsContext";
 import { AutoSavePlugin } from "./plugins/AutoSavePlugin";
 import CodeHighlightPlugin from "./plugins/CodeHighlightPlugin";
+import FloatingLinkEditorPlugin from "./plugins/FloatingLinkEditorPlugin";
+import LinkPlugin from "./plugins/LinkPlugin";
 import {
   LocalStoragePlugin,
   SAVE_TO_LOCAL_STORAGE,
@@ -48,6 +51,7 @@ export function Editor() {
       HorizontalRuleNode,
       CodeHighlightNode,
       CodeNode,
+      LinkNode,
     ],
   };
 
@@ -82,6 +86,9 @@ export function Editor() {
 
           <HistoryPlugin />
           <HorizontalRulePlugin />
+          <LinkPlugin />
+
+          <FloatingLinkEditorPlugin />
           <ListPlugin />
           <LocalStoragePlugin />
           <CodeHighlightPlugin />

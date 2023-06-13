@@ -6,6 +6,7 @@ type FloatingLabelInputProps = {
   maxValue?: number;
   minValue?: number;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 };
 
 export function FloatingLabelInput({
@@ -16,6 +17,7 @@ export function FloatingLabelInput({
   maxValue,
   minValue,
   onChange,
+  onKeyDown,
 }: FloatingLabelInputProps): JSX.Element {
   return (
     <div className="relative z-0">
@@ -28,6 +30,7 @@ export function FloatingLabelInput({
         placeholder=" "
         value={value}
         onChange={onChange}
+        {...(onKeyDown && { onKeyDown })}
         {...(type === "number" && maxValue && { max: maxValue })}
         {...(type === "number" && minValue && { min: minValue })}
       />

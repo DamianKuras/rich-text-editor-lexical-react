@@ -1,4 +1,5 @@
 import { $isCodeNode, CODE_LANGUAGE_MAP } from "@lexical/code";
+import { $isLinkNode, TOGGLE_LINK_COMMAND } from "@lexical/link";
 import { $isListNode, ListNode } from "@lexical/list";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { INSERT_HORIZONTAL_RULE_COMMAND } from "@lexical/react/LexicalHorizontalRuleNode";
@@ -28,7 +29,7 @@ import {
   TextFormatType,
   UNDO_COMMAND,
 } from "lexical";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { IconContext } from "react-icons";
 import {
   FaAlignCenter,
@@ -38,6 +39,7 @@ import {
   FaBold,
   FaIndent,
   FaItalic,
+  FaLink,
   FaOutdent,
   FaRedo,
   FaSave,
@@ -55,6 +57,8 @@ import {
   SAVE_TO_LOCAL_STORAGE,
 } from "../plugins/LocalStoragePlugin";
 import { ToolbarButton } from "../ui/ToolbarButton";
+import { getSelectedNode } from "../utils/getSelectedNode";
+import { sanitizeUrl } from "../utils/url";
 import { BlockFormatDropdown } from "./BlockFormatDropdown";
 import { CodeLanguageDropdown } from "./CodeLanguageDropdown";
 import { SettingsDropdown } from "./SettingsDropdown";
@@ -70,6 +74,7 @@ export function ToolbarPlugin(): JSX.Element {
   const [selectedElementKey, setSelectedElementKey] = useState<NodeKey | null>(
     null
   );
+  const [isLink, setIsLink] = useState(false);
   const [isBold, setIsBold] = useState(false);
   const [isItalic, setIsItalic] = useState(false);
   const [isUnderline, setIsUnderline] = useState(false);
@@ -132,19 +137,38 @@ export function ToolbarPlugin(): JSX.Element {
       setIsStrikethrough(selection.hasFormat("strikethrough"));
       setIsSubscript(selection.hasFormat("subscript"));
       setIsSuperscript(selection.hasFormat("superscript"));
+
+      // Update links
+      const node = getSelectedNode(selection);
+      const parent = node.getParent();
+      if ($isLinkNode(parent) || $isLinkNode(node)) {
+        setIsLink(true);
+      } else {
+        setIsLink(false);
+      }
     }
+  }, [editor]);
+
+  useLayoutEffect(() => {
+    return editor.registerUpdateListener(
+      ({ dirtyElements, dirtyLeaves, prevEditorState, tags }) => {
+        if (
+          (dirtyElements.size === 0 && dirtyLeaves.size === 0) ||
+          prevEditorState.isEmpty() ||
+          tags.has("history-merge")
+        ) {
+          return;
+        }
+        setSaveStatus({
+          style: "bg-toolbar-unsaved",
+          message: "Unsaved",
+        });
+      }
+    );
   }, [editor]);
 
   useEffect(() => {
     return mergeRegister(
-      editor.registerUpdateListener(({ dirtyElements, dirtyLeaves }) => {
-        if (dirtyElements.size > 0 || dirtyLeaves.size > 0) {
-          setSaveStatus({
-            style: "bg-toolbar-unsaved",
-            message: "Unsaved",
-          });
-        }
-      }),
       editor.registerCommand<boolean>(
         SAVED_SUCCESSFULLY_TO_LOCAL_STORAGE,
         () => {
@@ -245,6 +269,14 @@ export function ToolbarPlugin(): JSX.Element {
   const handleSaveToLocalStorage = () => {
     editor.dispatchCommand(SAVE_TO_LOCAL_STORAGE, undefined);
   };
+
+  const hanldeToggleLink = useCallback(() => {
+    if (!isLink) {
+      editor.dispatchCommand(TOGGLE_LINK_COMMAND, sanitizeUrl("https://"));
+    } else {
+      editor.dispatchCommand(TOGGLE_LINK_COMMAND, null);
+    }
+  }, [editor, isLink]);
 
   return (
     <div className="sticky top-0 z-10 flex justify-between bg-toolbar-background p-1">
@@ -363,6 +395,13 @@ export function ToolbarPlugin(): JSX.Element {
                   onClick={() => handleFormatText("underline")}
                 >
                   <FaUnderline />
+                </ToolbarButton>
+                <ToolbarButton
+                  title="Link"
+                  clicked={isLink}
+                  onClick={() => hanldeToggleLink()}
+                >
+                  <FaLink />
                 </ToolbarButton>
                 <ToolbarButton
                   title="striketrough"

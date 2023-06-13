@@ -1,5 +1,4 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
-
 import { ToolbarButton } from "./ToolbarButton";
 
 type ClickOrTouchEvent = MouseEvent | TouchEvent;

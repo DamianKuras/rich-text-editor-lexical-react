@@ -62,4 +62,5 @@ export const EditorTheme = {
     url: "text-code-highlight-url",
     variable: "text-code-highlight-variable",
   },
+  link: "text-link",
 };

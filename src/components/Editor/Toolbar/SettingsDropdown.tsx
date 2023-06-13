@@ -1,9 +1,7 @@
 import { useContext } from "react";
-import { Dropdown } from "../ui/Dropdown";
-
 import { IoSettingsSharp } from "react-icons/io5";
 import { SettingsContext } from "../context/SettingsContext";
-
+import { Dropdown } from "../ui/Dropdown";
 import { FloatingLabelInput } from "../ui/FloatingLabelInput";
 import { ToolbarSwitch } from "../ui/ToolbarSwitch";
 
