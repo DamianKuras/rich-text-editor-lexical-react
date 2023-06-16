@@ -1,14 +1,14 @@
 import React, { ReactNode, useEffect, useRef, useState } from "react";
 import { IoMdArrowDropdown } from "react-icons/io";
 
-export interface DropdownItem<T extends React.Key> {
+export interface SelectItem<T extends React.Key> {
   key: T;
   selectedLabel: ReactNode;
-  dropDownLabel: ReactNode;
+  label: ReactNode;
 }
 
-interface SelectDropdownProps<T extends React.Key> {
-  dropDownItems: Map<T, DropdownItem<T>>;
+interface SelectProps<T extends React.Key> {
+  selectItems: Map<T, SelectItem<T>>;
   onSelect: (key: T) => void;
   selectedItemKey: T;
   defaultItemKey: T;
@@ -20,12 +20,12 @@ function useMapToArray<T, U>(map: Map<T, U>): U[] {
   return React.useMemo(() => Array.from(map.values()), [map]);
 }
 
-export function SelectDropdown<T extends React.Key>({
-  dropDownItems,
+export function Select<T extends React.Key>({
+  selectItems,
   onSelect,
   selectedItemKey,
   defaultItemKey,
-}: SelectDropdownProps<T>): JSX.Element {
+}: SelectProps<T>): JSX.Element {
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
@@ -54,10 +54,10 @@ export function SelectDropdown<T extends React.Key>({
     };
   }, [isDropdownOpen]);
 
-  const selectedItem = dropDownItems.get(selectedItemKey);
-  const defaultItem = dropDownItems.get(defaultItemKey);
+  const selectedItem = selectItems.get(selectedItemKey);
+  const defaultItem = selectItems.get(defaultItemKey);
 
-  const dropDownItemsArray = useMapToArray(dropDownItems);
+  const dropDownItemsArray = useMapToArray(selectItems);
   return (
     <div ref={dropdownRef}>
       <button
@@ -74,13 +74,13 @@ export function SelectDropdown<T extends React.Key>({
       {isDropdownOpen && (
         <div className="absolute z-10 mt-2 bg-toolbar-background shadow-lg">
           <div className="py-1">
-            {dropDownItemsArray.map((dropDownItem: DropdownItem<T>) => (
+            {dropDownItemsArray.map((dropDownItem: SelectItem<T>) => (
               <div
                 key={dropDownItem.key}
                 className="cursor-pointer px-2 py-1 text-toolbar-text hover:bg-toolbar-hover"
                 onClick={() => handleDropdownItemSelection(dropDownItem.key)}
               >
-                {dropDownItem.dropDownLabel}
+                {dropDownItem.label}
               </div>
             ))}
           </div>

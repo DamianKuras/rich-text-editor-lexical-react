@@ -53,20 +53,22 @@ import { MdInsertPageBreak } from "react-icons/md";
 import { BlockType } from "../index";
 import {
   FAILED_TO_SAVE_TO_LOCAL_STORAGE,
+  LOCAL_STORAGE_SAVE_STATUS,
   SAVED_SUCCESSFULLY_TO_LOCAL_STORAGE,
   SAVE_TO_LOCAL_STORAGE,
 } from "../plugins/LocalStoragePlugin";
 import { ToolbarButton } from "../ui/ToolbarButton";
 import { getSelectedNode } from "../utils/getSelectedNode";
 import { sanitizeUrl } from "../utils/url";
-import { BlockFormatDropdown } from "./BlockFormatDropdown";
-import { CodeLanguageDropdown } from "./CodeLanguageDropdown";
+import { BlockFormatSelect } from "./BlockFormatSelect";
+import { CodeLanguageSelect } from "./CodeLanguageSelect";
 import { SettingsDropdown } from "./SettingsDropdown";
 
 export function ToolbarPlugin(): JSX.Element {
   const [editor] = useLexicalComposerContext();
+  const [activeEditor, setActiveEditor] = useState(editor);
   const [saveStatus, setSaveStatus] = useState({
-    style: "bg-toolbar-success",
+    style: "bg-success",
     message: "Saved to local storage",
   });
   const [canUndo, setCanUndo] = useState(false);
@@ -102,7 +104,7 @@ export function ToolbarPlugin(): JSX.Element {
       }
 
       const elementKey = element.getKey();
-      const elementDOM = editor.getElementByKey(elementKey);
+      const elementDOM = activeEditor.getElementByKey(elementKey);
       if (elementDOM !== null) {
         setSelectedElementKey(elementKey);
         if ($isListNode(element)) {
@@ -138,7 +140,6 @@ export function ToolbarPlugin(): JSX.Element {
       setIsSubscript(selection.hasFormat("subscript"));
       setIsSuperscript(selection.hasFormat("superscript"));
 
-      // Update links
       const node = getSelectedNode(selection);
       const parent = node.getParent();
       if ($isLinkNode(parent) || $isLinkNode(node)) {
@@ -147,7 +148,7 @@ export function ToolbarPlugin(): JSX.Element {
         setIsLink(false);
       }
     }
-  }, [editor]);
+  }, [activeEditor]);
 
   useLayoutEffect(() => {
     return editor.registerUpdateListener(
@@ -160,7 +161,7 @@ export function ToolbarPlugin(): JSX.Element {
           return;
         }
         setSaveStatus({
-          style: "bg-toolbar-unsaved",
+          style: "bg-unsaved",
           message: "Unsaved",
         });
       }
@@ -168,31 +169,43 @@ export function ToolbarPlugin(): JSX.Element {
   }, [editor]);
 
   useEffect(() => {
-    return mergeRegister(
-      editor.registerCommand<boolean>(
-        SAVED_SUCCESSFULLY_TO_LOCAL_STORAGE,
-        () => {
+    return editor.registerCommand(
+      SELECTION_CHANGE_COMMAND,
+      (_payload, newEditor) => {
+        updateToolbarSelections();
+        setActiveEditor(newEditor);
+        return false;
+      },
+      COMMAND_PRIORITY_CRITICAL
+    );
+  }, [editor, updateToolbarSelections]);
+
+  useEffect(() => {
+    return editor.registerCommand<string>(
+      LOCAL_STORAGE_SAVE_STATUS,
+      (payload) => {
+        if (payload === SAVED_SUCCESSFULLY_TO_LOCAL_STORAGE) {
           setSaveStatus({
-            style: "bg-toolbar-success",
+            style: "bg-success",
             message: "Saved to local storage",
           });
-          return true;
-        },
-        COMMAND_PRIORITY_LOW
-      ),
-      editor.registerCommand<boolean>(
-        FAILED_TO_SAVE_TO_LOCAL_STORAGE,
-        () => {
+        }
+        if (payload === FAILED_TO_SAVE_TO_LOCAL_STORAGE) {
           setSaveStatus({
-            style: "bg-red-500",
+            style: "bg-error",
             message:
               "Failed to save to local storage. Check if browser has local storage enabled.",
           });
-          return true;
-        },
-        COMMAND_PRIORITY_LOW
-      ),
-      editor.registerCommand<boolean>(
+        }
+        return true;
+      },
+      COMMAND_PRIORITY_LOW
+    );
+  }, [editor]);
+
+  useEffect(() => {
+    return mergeRegister(
+      activeEditor.registerCommand<boolean>(
         CAN_UNDO_COMMAND,
         (payload) => {
           setCanUndo(payload);
@@ -200,40 +213,35 @@ export function ToolbarPlugin(): JSX.Element {
         },
         COMMAND_PRIORITY_CRITICAL
       ),
-      editor.registerCommand<boolean>(
+      activeEditor.registerCommand<boolean>(
         CAN_REDO_COMMAND,
         (payload) => {
           setCanRedo(payload);
           return false;
         },
         COMMAND_PRIORITY_CRITICAL
-      ),
-      editor.registerCommand(
-        SELECTION_CHANGE_COMMAND,
-        () => {
-          updateToolbarSelections();
-          return false;
-        },
-        COMMAND_PRIORITY_CRITICAL
-      ),
-      editor.registerUpdateListener(({ editorState }) => {
-        editorState.read(() => {
-          updateToolbarSelections();
-        });
-      })
+      )
     );
-  }, [editor, updateToolbarSelections]);
+  }, [activeEditor]);
+
+  useEffect(() => {
+    activeEditor.registerUpdateListener(({ editorState }) => {
+      editorState.read(() => {
+        updateToolbarSelections();
+      });
+    });
+  }, [activeEditor, updateToolbarSelections]);
 
   const handleUndo = () => {
-    editor.dispatchCommand(UNDO_COMMAND, undefined);
+    activeEditor.dispatchCommand(UNDO_COMMAND, undefined);
   };
 
   const handleRedo = () => {
-    editor.dispatchCommand(REDO_COMMAND, undefined);
+    activeEditor.dispatchCommand(REDO_COMMAND, undefined);
   };
 
   const handleFormatElement = (element: ElementFormatType) => {
-    editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, element);
+    activeEditor.dispatchCommand(FORMAT_ELEMENT_COMMAND, element);
   };
 
   const handleCodeLangugeChange = useCallback(
@@ -259,7 +267,7 @@ export function ToolbarPlugin(): JSX.Element {
   };
 
   const handleFormatText = (format: TextFormatType) => {
-    editor.dispatchCommand(FORMAT_TEXT_COMMAND, format);
+    activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, format);
   };
 
   const handleInsertHorizontalRule = () => {
@@ -270,13 +278,16 @@ export function ToolbarPlugin(): JSX.Element {
     editor.dispatchCommand(SAVE_TO_LOCAL_STORAGE, undefined);
   };
 
-  const hanldeToggleLink = useCallback(() => {
+  const handleToggleLink = useCallback(() => {
     if (!isLink) {
-      editor.dispatchCommand(TOGGLE_LINK_COMMAND, sanitizeUrl("https://"));
+      activeEditor.dispatchCommand(
+        TOGGLE_LINK_COMMAND,
+        sanitizeUrl("https://")
+      );
     } else {
-      editor.dispatchCommand(TOGGLE_LINK_COMMAND, null);
+      activeEditor.dispatchCommand(TOGGLE_LINK_COMMAND, null);
     }
-  }, [editor, isLink]);
+  }, [activeEditor, isLink]);
 
   return (
     <div className="sticky top-0 z-10 flex justify-between bg-toolbar-background p-1">
@@ -306,18 +317,21 @@ export function ToolbarPlugin(): JSX.Element {
               <FaRedo />
             </ToolbarButton>
           </div>
-          <div className="flex min-w-[8em] justify-center border-r px-1">
-            <div className="my-auto">
-              <BlockFormatDropdown
-                editor={editor}
-                selectedBlockType={selectedBlockType}
-              />
+          {activeEditor === editor && (
+            <div className="flex min-w-[8em] justify-center border-r px-1">
+              <div className="my-auto">
+                <BlockFormatSelect
+                  editor={editor}
+                  selectedBlockType={selectedBlockType}
+                />
+              </div>
             </div>
-          </div>
+          )}
+
           {selectedBlockType === "code" && (
             <div className="flex min-w-[8em] justify-center border-r px-1">
               <div className="my-auto">
-                <CodeLanguageDropdown
+                <CodeLanguageSelect
                   onCodeLanguageChange={handleCodeLangugeChange}
                   selectedCodeLanguage={codeLanguage}
                 />
@@ -399,7 +413,7 @@ export function ToolbarPlugin(): JSX.Element {
                 <ToolbarButton
                   title="Link"
                   clicked={isLink}
-                  onClick={() => hanldeToggleLink()}
+                  onClick={() => handleToggleLink()}
                 >
                   <FaLink />
                 </ToolbarButton>

@@ -2,14 +2,12 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { COMMAND_PRIORITY_LOW, LexicalCommand, createCommand } from "lexical";
 import { useEffect } from "react";
 
-export const SAVE_TO_LOCAL_STORAGE: LexicalCommand<void> = createCommand();
-export const SAVED_SUCCESSFULLY_TO_LOCAL_STORAGE: LexicalCommand<void> =
-  createCommand();
-
-export const FAILED_TO_SAVE_TO_LOCAL_STORAGE: LexicalCommand<void> =
-  createCommand();
-
 const LocalStorageKey = "editor-saved-state";
+export const SAVED_SUCCESSFULLY_TO_LOCAL_STORAGE = "Success";
+export const FAILED_TO_SAVE_TO_LOCAL_STORAGE = "Error";
+export const SAVE_TO_LOCAL_STORAGE: LexicalCommand<void> = createCommand();
+export const LOCAL_STORAGE_SAVE_STATUS: LexicalCommand<string> =
+  createCommand();
 
 export function getSavedStateFromLocalStorage(): string | null {
   return localStorage.getItem(LocalStorageKey);
@@ -28,14 +26,16 @@ export function LocalStoragePlugin() {
         try {
           localStorage.setItem(LocalStorageKey, editorSerializedContent);
           editor.dispatchCommand(
-            SAVED_SUCCESSFULLY_TO_LOCAL_STORAGE,
-            undefined
+            LOCAL_STORAGE_SAVE_STATUS,
+            SAVED_SUCCESSFULLY_TO_LOCAL_STORAGE
           );
-          return true;
         } catch (error) {
-          editor.dispatchCommand(FAILED_TO_SAVE_TO_LOCAL_STORAGE, undefined);
-          return false;
+          editor.dispatchCommand(
+            LOCAL_STORAGE_SAVE_STATUS,
+            FAILED_TO_SAVE_TO_LOCAL_STORAGE
+          );
         }
+        return true;
       },
       COMMAND_PRIORITY_LOW
     );

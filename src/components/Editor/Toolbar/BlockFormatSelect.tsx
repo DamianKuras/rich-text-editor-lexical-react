@@ -16,7 +16,7 @@ import {
   LexicalEditor,
 } from "lexical";
 import { BlockType } from "../index";
-import { DropdownItem, SelectDropdown } from "../ui/SelectDropdown";
+import { Select, SelectItem } from "../ui/Select";
 
 const formatHeading = (
   editor: LexicalEditor,
@@ -30,16 +30,16 @@ const formatHeading = (
   });
 };
 
-interface BlockFormatDropdownItem extends DropdownItem<BlockType> {
+interface BlockFormatSelectItem extends SelectItem<BlockType> {
   formatHandler: (editor: LexicalEditor) => void;
 }
 
-const dropDownItems: Map<BlockType, BlockFormatDropdownItem> = new Map([
+const selectItems: Map<BlockType, BlockFormatSelectItem> = new Map([
   [
     "paragraph",
     {
       selectedLabel: "Paragraph",
-      dropDownLabel: "Paragraph",
+      label: "Paragraph",
       key: "paragraph",
       formatHandler: (editor: LexicalEditor) => {
         editor.update(() => {
@@ -55,7 +55,7 @@ const dropDownItems: Map<BlockType, BlockFormatDropdownItem> = new Map([
     "h1",
     {
       selectedLabel: "Heading 1",
-      dropDownLabel: <span className="bold text-2xl">Heading 1</span>,
+      label: <span className="bold text-2xl">Heading 1</span>,
       key: "h1",
       formatHandler: (editor: LexicalEditor) => {
         formatHeading(editor, "h1");
@@ -66,7 +66,7 @@ const dropDownItems: Map<BlockType, BlockFormatDropdownItem> = new Map([
     "h2",
     {
       selectedLabel: "Heading 2",
-      dropDownLabel: <h2 className="text-xl">Heading 2</h2>,
+      label: <h2 className="text-xl">Heading 2</h2>,
       key: "h2",
       formatHandler: (editor: LexicalEditor) => {
         formatHeading(editor, "h2");
@@ -77,7 +77,7 @@ const dropDownItems: Map<BlockType, BlockFormatDropdownItem> = new Map([
     "h3",
     {
       selectedLabel: "Heading 3",
-      dropDownLabel: <h3 className="text-lg">Heading 3</h3>,
+      label: <h3 className="text-lg">Heading 3</h3>,
       key: "h3",
       formatHandler: (editor: LexicalEditor) => {
         formatHeading(editor, "h3");
@@ -88,7 +88,7 @@ const dropDownItems: Map<BlockType, BlockFormatDropdownItem> = new Map([
     "bullet",
     {
       selectedLabel: "Bullet list",
-      dropDownLabel: <span>&bull; Bullet list</span>,
+      label: <span>&bull; Bullet list</span>,
       key: "bullet",
       formatHandler: (editor: LexicalEditor) => {
         editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined);
@@ -99,7 +99,7 @@ const dropDownItems: Map<BlockType, BlockFormatDropdownItem> = new Map([
     "number",
     {
       selectedLabel: "Ordered list",
-      dropDownLabel: "1. Ordered list",
+      label: "1. Ordered list",
       key: "number",
       formatHandler: (editor: LexicalEditor) => {
         editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined);
@@ -110,7 +110,7 @@ const dropDownItems: Map<BlockType, BlockFormatDropdownItem> = new Map([
     "quote",
     {
       selectedLabel: "Quote",
-      dropDownLabel: <span>&ldquo;Quote&rdquo;</span>,
+      label: <span>&ldquo;Quote&rdquo;</span>,
       key: "quote",
       formatHandler: (editor: LexicalEditor) => {
         editor.update(() => {
@@ -126,7 +126,7 @@ const dropDownItems: Map<BlockType, BlockFormatDropdownItem> = new Map([
     "code",
     {
       selectedLabel: "Code",
-      dropDownLabel: <span>&lt;code&gt;</span>,
+      label: <span>&lt;code&gt;</span>,
       key: "code",
       formatHandler: (editor: LexicalEditor) => {
         editor.update(() => {
@@ -149,24 +149,24 @@ const dropDownItems: Map<BlockType, BlockFormatDropdownItem> = new Map([
   ],
 ]);
 
-interface BlockLevelFormatDropdownProps {
+interface BlockFormatSelectProps {
   editor: LexicalEditor;
   selectedBlockType: BlockType;
 }
 
-export function BlockFormatDropdown({
+export function BlockFormatSelect({
   editor,
   selectedBlockType,
-}: BlockLevelFormatDropdownProps): JSX.Element {
+}: BlockFormatSelectProps): JSX.Element {
   const handleBlockFormatDropdownItemSelection = (type: BlockType) => {
     if (selectedBlockType === type) {
       return;
     }
-    dropDownItems.get(type)?.formatHandler(editor);
+    selectItems.get(type)?.formatHandler(editor);
   };
   return (
-    <SelectDropdown
-      dropDownItems={dropDownItems}
+    <Select
+      selectItems={selectItems}
       selectedItemKey={selectedBlockType}
       defaultItemKey={"paragraph"}
       onSelect={

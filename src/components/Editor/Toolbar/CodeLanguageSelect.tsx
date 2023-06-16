@@ -1,38 +1,38 @@
 import { CODE_LANGUAGE_FRIENDLY_NAME_MAP } from "@lexical/code";
-import { DropdownItem, SelectDropdown } from "../ui/SelectDropdown";
+import { Select, SelectItem } from "../ui/Select";
 
-type CodeLanguageDropdownProps = {
+type CodeLanguageSelectProps = {
   onCodeLanguageChange: (language: string) => void;
   selectedCodeLanguage: string;
 };
-const dropdownItems: Map<string, DropdownItem<string>> = Object.entries(
+const selectItems: Map<string, SelectItem<string>> = Object.entries(
   CODE_LANGUAGE_FRIENDLY_NAME_MAP
 ).reduce((map, [lang, friendlyName]) => {
   map.set(lang, {
     key: lang,
     selectedLabel: <span>{friendlyName}</span>,
-    dropDownLabel: <span className="text-sm">{friendlyName}</span>,
+    label: <span className="text-sm">{friendlyName}</span>,
   });
   return map;
-}, new Map<string, DropdownItem<string>>());
+}, new Map<string, SelectItem<string>>());
 
-export function CodeLanguageDropdown({
+export function CodeLanguageSelect({
   onCodeLanguageChange,
   selectedCodeLanguage,
-}: CodeLanguageDropdownProps): JSX.Element {
-  const handleCodeLanguageDropdownItemSelection = (language: string) => {
+}: CodeLanguageSelectProps): JSX.Element {
+  const handleCodeLanguageSelection = (language: string) => {
     if (selectedCodeLanguage === language) {
       return;
     }
     onCodeLanguageChange(language);
   };
   return (
-    <SelectDropdown
-      dropDownItems={dropdownItems}
+    <Select
+      selectItems={selectItems}
       selectedItemKey={selectedCodeLanguage}
       defaultItemKey={"js"}
       onSelect={
-        handleCodeLanguageDropdownItemSelection as (language: string) => void
+        handleCodeLanguageSelection as (language: string) => void
       }
     />
   );
