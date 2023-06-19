@@ -24,6 +24,7 @@ import {
   SAVE_TO_LOCAL_STORAGE,
   getSavedStateFromLocalStorage,
 } from "./plugins/LocalStoragePlugin";
+import { ShowHtml } from "./plugins/ShowHtml";
 
 export type BlockType =
   | "paragraph"
@@ -93,6 +94,7 @@ export function Editor() {
           <LocalStoragePlugin />
           <CodeHighlightPlugin />
           <TabIndentationPlugin />
+          <ShowHtml />
           <AutoSavePlugin
             SaveCommand={SAVE_TO_LOCAL_STORAGE}
             AutoSaveEnabled={autoSaveEnabled}

@@ -31,6 +31,7 @@ import {
 } from "lexical";
 import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { IconContext } from "react-icons";
+import { BsFileEarmarkCode } from "react-icons/bs";
 import {
   FaAlignCenter,
   FaAlignJustify,
@@ -57,6 +58,7 @@ import {
   SAVED_SUCCESSFULLY_TO_LOCAL_STORAGE,
   SAVE_TO_LOCAL_STORAGE,
 } from "../plugins/LocalStoragePlugin";
+import { TOGGLE_HTML_VISIBILITY_COMMAND } from "../plugins/ShowHtml";
 import { ToolbarButton } from "../ui/ToolbarButton";
 import { getSelectedNode } from "../utils/getSelectedNode";
 import { sanitizeUrl } from "../utils/url";
@@ -445,6 +447,17 @@ export function ToolbarPlugin(): JSX.Element {
                   onClick={() => handleInsertHorizontalRule()}
                 >
                   <MdInsertPageBreak />
+                </ToolbarButton>
+                <ToolbarButton
+                  title="show/hide html"
+                  onClick={() => {
+                    editor.dispatchCommand(
+                      TOGGLE_HTML_VISIBILITY_COMMAND,
+                      undefined
+                    );
+                  }}
+                >
+                  <BsFileEarmarkCode />
                 </ToolbarButton>
               </div>
             </>
