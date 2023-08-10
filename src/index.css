@@ -2,6 +2,56 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes slide {
+  from {
+    transform: var(--origin);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.react-aria-Tooltip {
+  &[data-placement="top"] {
+    margin-bottom: 8px;
+    --origin: translateY(4px);
+  }
+
+  &[data-placement="bottom"] {
+    margin-top: 8px;
+    --origin: translateY(-4px);
+    & .react-aria-OverlayArrow svg {
+      transform: rotate(180deg);
+    }
+  }
+
+  &[data-placement="right"] {
+    margin-left: 8px;
+    --origin: translateX(-4px);
+    & .react-aria-OverlayArrow svg {
+      transform: rotate(90deg);
+    }
+  }
+
+  &[data-placement="left"] {
+    margin-right: 8px;
+    --origin: translateX(4px);
+    & .react-aria-OverlayArrow svg {
+      transform: rotate(-90deg);
+    }
+  }
+  &[data-entering] {
+    animation: slide 200ms;
+  }
+
+  &[data-exiting] {
+    animation: slide 200ms reverse ease-in;
+  }
+}
+
 .custom-underline-strikethrough {
   text-decoration: underline line-through;
 }

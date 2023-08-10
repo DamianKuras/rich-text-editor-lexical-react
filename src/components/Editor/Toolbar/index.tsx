@@ -31,13 +31,13 @@ import {
 } from "lexical";
 import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { IconContext } from "react-icons";
-import { BsFileEarmarkCode } from "react-icons/bs";
 import {
   FaAlignCenter,
   FaAlignJustify,
   FaAlignLeft,
   FaAlignRight,
   FaBold,
+  FaFileCode,
   FaIndent,
   FaItalic,
   FaLink,
@@ -58,8 +58,10 @@ import {
   SAVED_SUCCESSFULLY_TO_LOCAL_STORAGE,
   SAVE_TO_LOCAL_STORAGE,
 } from "../plugins/LocalStoragePlugin";
+
 import { TOGGLE_HTML_VISIBILITY_COMMAND } from "../plugins/ShowHtml";
-import { ToolbarButton } from "../ui/ToolbarButton";
+import { TooltipButton } from "../ui/TooltipButton";
+import { TooltipToggleButton } from "../ui/TooltipToggleButton";
 import { getSelectedNode } from "../utils/getSelectedNode";
 import { sanitizeUrl } from "../utils/url";
 import { BlockFormatSelect } from "./BlockFormatSelect";
@@ -135,6 +137,7 @@ export function ToolbarPlugin(): JSX.Element {
           return;
         }
       }
+      console.log(selection.hasFormat("bold"));
       setIsBold(selection.hasFormat("bold"));
       setIsItalic(selection.hasFormat("italic"));
       setIsUnderline(selection.hasFormat("underline"));
@@ -175,11 +178,14 @@ export function ToolbarPlugin(): JSX.Element {
       SELECTION_CHANGE_COMMAND,
       (_payload, newEditor) => {
         updateToolbarSelections();
-        setActiveEditor(newEditor);
+        if (activeEditor !== newEditor) {
+          setActiveEditor(newEditor);
+        }
         return false;
       },
       COMMAND_PRIORITY_CRITICAL
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editor, updateToolbarSelections]);
 
   useEffect(() => {
@@ -261,11 +267,11 @@ export function ToolbarPlugin(): JSX.Element {
   );
 
   const handleIndent = () => {
-    editor.dispatchCommand(INDENT_CONTENT_COMMAND, undefined);
+    activeEditor.dispatchCommand(INDENT_CONTENT_COMMAND, undefined);
   };
 
   const handleOutdent = () => {
-    editor.dispatchCommand(OUTDENT_CONTENT_COMMAND, undefined);
+    activeEditor.dispatchCommand(OUTDENT_CONTENT_COMMAND, undefined);
   };
 
   const handleFormatText = (format: TextFormatType) => {
@@ -273,7 +279,7 @@ export function ToolbarPlugin(): JSX.Element {
   };
 
   const handleInsertHorizontalRule = () => {
-    editor.dispatchCommand(INSERT_HORIZONTAL_RULE_COMMAND, undefined);
+    activeEditor.dispatchCommand(INSERT_HORIZONTAL_RULE_COMMAND, undefined);
   };
 
   const handleSaveToLocalStorage = () => {
@@ -303,21 +309,22 @@ export function ToolbarPlugin(): JSX.Element {
             <SettingsDropdown />
           </div>
 
-          <div className="border-r px-2">
-            <ToolbarButton
-              title="Undo (Ctrl+z)"
+          <div className="flex border-r px-2">
+            <TooltipButton
+              tooltipMessage="Undo (Ctrl+z)"
               disabled={!canUndo}
-              onClick={handleUndo}
+              onPress={handleUndo}
             >
               <FaUndo />
-            </ToolbarButton>
-            <ToolbarButton
-              title="Redo (Ctrl+y)"
+            </TooltipButton>
+
+            <TooltipButton
+              tooltipMessage="Redo (Ctrl+y)"
               disabled={!canRedo}
-              onClick={handleRedo}
+              onPress={handleRedo}
             >
               <FaRedo />
-            </ToolbarButton>
+            </TooltipButton>
           </div>
           {activeEditor === editor && (
             <div className="flex min-w-[8em] justify-center border-r px-1">
@@ -341,46 +348,48 @@ export function ToolbarPlugin(): JSX.Element {
             </div>
           )}
 
-          <div className="border-r px-2">
-            <ToolbarButton
-              title="Align left"
-              className="mr-1"
-              onClick={() => handleFormatElement("left")}
+          <div className="flex border-r px-2">
+            <TooltipButton
+              tooltipMessage="Align left"
+              onPress={() => handleFormatElement("left")}
             >
               <FaAlignLeft />
-            </ToolbarButton>
-            <ToolbarButton
-              title="Align center"
-              className="mr-1"
-              onClick={() => handleFormatElement("center")}
+            </TooltipButton>
+
+            <TooltipButton
+              tooltipMessage="Align center"
+              onPress={() => handleFormatElement("center")}
             >
               <FaAlignCenter />
-            </ToolbarButton>
-            <ToolbarButton
-              title="Align right"
-              className="mr-1"
-              onClick={() => handleFormatElement("right")}
+            </TooltipButton>
+
+            <TooltipButton
+              tooltipMessage="Align right"
+              onPress={() => handleFormatElement("right")}
             >
               <FaAlignRight />
-            </ToolbarButton>
-            <ToolbarButton
-              title="Align justify"
-              onClick={() => handleFormatElement("justify")}
+            </TooltipButton>
+
+            <TooltipButton
+              tooltipMessage="Align justify"
+              onPress={() => handleFormatElement("justify")}
             >
               <FaAlignJustify />
-            </ToolbarButton>
-            <ToolbarButton
-              title="Indent"
-              onClick={() => handleIndent()}
+            </TooltipButton>
+
+            <TooltipButton
+              tooltipMessage="Indent"
+              onPress={() => handleIndent()}
             >
               <FaIndent />
-            </ToolbarButton>
-            <ToolbarButton
-              title="Outdent"
-              onClick={() => handleOutdent()}
+            </TooltipButton>
+
+            <TooltipButton
+              tooltipMessage="Outdent"
+              onPress={() => handleOutdent()}
             >
               <FaOutdent />
-            </ToolbarButton>
+            </TooltipButton>
           </div>
           {(selectedBlockType === "paragraph" ||
             selectedBlockType === "h1" ||
@@ -390,87 +399,95 @@ export function ToolbarPlugin(): JSX.Element {
             selectedBlockType === "number" ||
             selectedBlockType === "quote") && (
             <>
-              <div className="border-r px-2">
-                <ToolbarButton
-                  title="Bold"
-                  clicked={isBold}
-                  onClick={() => handleFormatText("bold")}
+              <div className="flex border-r px-2">
+                <TooltipToggleButton
+                  tooltipMessage="Bold"
+                  selected={isBold}
+                  onPress={() => {
+                    handleFormatText("bold");
+                  }}
                 >
                   <FaBold />
-                </ToolbarButton>
-                <ToolbarButton
-                  title="Italic"
-                  clicked={isItalic}
-                  onClick={() => handleFormatText("italic")}
+                </TooltipToggleButton>
+
+                <TooltipToggleButton
+                  tooltipMessage="Italic"
+                  selected={isItalic}
+                  onPress={() => handleFormatText("italic")}
                 >
                   <FaItalic />
-                </ToolbarButton>
-                <ToolbarButton
-                  title="Underline"
-                  clicked={isUnderline}
-                  onClick={() => handleFormatText("underline")}
+                </TooltipToggleButton>
+
+                <TooltipToggleButton
+                  tooltipMessage="Underline"
+                  selected={isUnderline}
+                  onPress={() => handleFormatText("underline")}
                 >
                   <FaUnderline />
-                </ToolbarButton>
-                <ToolbarButton
-                  title="Link"
-                  clicked={isLink}
-                  onClick={() => handleToggleLink()}
+                </TooltipToggleButton>
+
+                <TooltipToggleButton
+                  tooltipMessage="Link"
+                  selected={isLink}
+                  onPress={() => handleToggleLink()}
                 >
                   <FaLink />
-                </ToolbarButton>
-                <ToolbarButton
-                  title="striketrough"
-                  clicked={isStrikethrough}
-                  onClick={() => handleFormatText("strikethrough")}
+                </TooltipToggleButton>
+
+                <TooltipToggleButton
+                  tooltipMessage="striketrough"
+                  selected={isStrikethrough}
+                  onPress={() => handleFormatText("strikethrough")}
                 >
                   <FaStrikethrough />
-                </ToolbarButton>
-                <ToolbarButton
-                  title="Subscript"
-                  clicked={isSubscript}
-                  onClick={() => handleFormatText("subscript")}
+                </TooltipToggleButton>
+
+                <TooltipToggleButton
+                  tooltipMessage="Subscript"
+                  selected={isSubscript}
+                  onPress={() => handleFormatText("subscript")}
                 >
                   <FaSubscript />
-                </ToolbarButton>
-                <ToolbarButton
-                  title="Superscript"
-                  clicked={isSuperscript}
-                  onClick={() => handleFormatText("superscript")}
+                </TooltipToggleButton>
+
+                <TooltipToggleButton
+                  tooltipMessage="Superscript"
+                  selected={isSuperscript}
+                  onPress={() => handleFormatText("superscript")}
                 >
                   <FaSuperscript />
-                </ToolbarButton>
+                </TooltipToggleButton>
               </div>
               <div className="flex px-2">
-                <ToolbarButton
-                  title="Insert horizontal rule"
-                  onClick={() => handleInsertHorizontalRule()}
+                <TooltipButton
+                  tooltipMessage="Insert horizontal rule"
+                  onPress={() => handleInsertHorizontalRule()}
                 >
                   <MdInsertPageBreak />
-                </ToolbarButton>
-                <ToolbarButton
-                  title="show/hide html"
-                  onClick={() => {
+                </TooltipButton>
+                <TooltipButton
+                  tooltipMessage="show/hide html"
+                  onPress={() => {
                     editor.dispatchCommand(
                       TOGGLE_HTML_VISIBILITY_COMMAND,
                       undefined
                     );
                   }}
                 >
-                  <BsFileEarmarkCode />
-                </ToolbarButton>
+                  <FaFileCode />
+                </TooltipButton>
               </div>
             </>
           )}
         </div>
 
         <div className="inline-flex items-center justify-center">
-          <ToolbarButton
-            onClick={() => handleSaveToLocalStorage()}
-            title="Save to local storage"
+          <TooltipButton
+            onPress={() => handleSaveToLocalStorage()}
+            tooltipMessage="Save to local storage"
           >
             <FaSave />
-          </ToolbarButton>
+          </TooltipButton>
           <div
             className={saveStatus.style + " h-2 w-2 rounded-full"}
             title={saveStatus.message}

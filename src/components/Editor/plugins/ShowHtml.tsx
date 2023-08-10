@@ -8,7 +8,7 @@ import {
 } from "lexical";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BiCheck, BiClipboard, BiHide, BiRefresh } from "react-icons/bi";
-import { ToolbarButton } from "../ui/ToolbarButton";
+import { TooltipButton } from "../ui/TooltipButton";
 
 export const TOGGLE_HTML_VISIBILITY_COMMAND: LexicalCommand<void> =
   createCommand();
@@ -111,33 +111,33 @@ export function ShowHtml() {
       {isVisible && (
         <ScrollIntoViewIfNeeded isVisible={isVisible}>
           <div className="absolute right-0 top-0 flex bg-toolbar-background px-2 py-1">
-            <ToolbarButton
-              title="Hide html"
-              onClick={handleHideClick}
+            <TooltipButton
+              tooltipMessage="Hide html"
+              onPress={handleHideClick}
               className="text-toolbar-text"
             >
               <span className="mr-2 flex items-center gap-1">
                 <BiHide /> Hide
               </span>
-            </ToolbarButton>
-            <ToolbarButton
-              title="Update html"
-              onClick={handleUpdateClick}
+            </TooltipButton>
+            <TooltipButton
+              tooltipMessage="Update html"
+              onPress={handleUpdateClick}
               className="text-toolbar-text"
             >
               <span className="mr-2 flex items-center gap-1">
                 <BiRefresh /> Update
               </span>
-            </ToolbarButton>
-            <ToolbarButton
-              title="Copy html"
-              onClick={handleCopyClick}
+            </TooltipButton>
+            <TooltipButton
+              tooltipMessage="Copy html"
+              onPress={handleCopyClick}
               className="text-toolbar-text"
             >
               <span className="flex items-center gap-1">
                 {isCopied ? <BiCheck /> : <BiClipboard />} Copy to clipboard
               </span>
-            </ToolbarButton>
+            </TooltipButton>
           </div>
           <div className="mb-4 max-h-96 overflow-y-scroll">
             <pre className="whitespace-pre-wrap p-4 text-editor-text">

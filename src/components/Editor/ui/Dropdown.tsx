@@ -1,5 +1,5 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
-import { ToolbarButton } from "./ToolbarButton";
+import { TooltipToggleButton } from "./TooltipToggleButton";
 
 type ClickOrTouchEvent = MouseEvent | TouchEvent;
 
@@ -36,13 +36,13 @@ export function Dropdown({
   }, [isDropdownOpen]);
   return (
     <div ref={dropdownRef}>
-      <ToolbarButton
-        title={dropdownTitle}
-        onClick={toggleDropdown}
-        clicked={isDropdownOpen}
+      <TooltipToggleButton
+        tooltipMessage={dropdownTitle}
+        onPress={toggleDropdown}
+        selected={isDropdownOpen}
       >
         {buttonContent}
-      </ToolbarButton>
+      </TooltipToggleButton>
 
       {isDropdownOpen && (
         <div className="absolute z-10 mt-2 bg-toolbar-background shadow-lg">

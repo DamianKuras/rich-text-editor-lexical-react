@@ -32,10 +32,10 @@ import { IconContext } from "react-icons";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { GiCancel, GiConfirmed } from "react-icons/gi";
 import { FloatingLabelInput } from "../ui/FloatingLabelInput";
-import { ToolbarButton } from "../ui/ToolbarButton";
 import { getSelectedNode } from "../utils/getSelectedNode";
 import { setFloatingElemPositionForLinkEditor } from "../utils/setFloatingElemPositionForLinkEditor";
 import { sanitizeUrl } from "../utils/url";
+import { TooltipButton } from "../ui/TooltipButton";
 
 function FloatingLinkEditor({
   editor,
@@ -220,19 +220,19 @@ function FloatingLinkEditor({
               />
             </div>
             <div>
-              <ToolbarButton
-                title="Cancel link"
-                onClick={() => setEditMode(false)}
+              <TooltipButton
+                tooltipMessage="Cancel link"
+                onPress={() => setEditMode(false)}
               >
                 <GiCancel />
-              </ToolbarButton>
+              </TooltipButton>
 
-              <ToolbarButton
-                title="confirm link"
-                onClick={handleLinkSubmission}
+              <TooltipButton
+                tooltipMessage="confirm link"
+                onPress={handleLinkSubmission}
               >
                 <GiConfirmed />
-              </ToolbarButton>
+              </TooltipButton>
             </div>
           </div>
         ) : (
@@ -246,23 +246,23 @@ function FloatingLinkEditor({
               {linkUrl}
             </a>
             <div>
-              <ToolbarButton
-                title="Edit link"
-                onClick={() => {
+              <TooltipButton
+                tooltipMessage="Edit link"
+                onPress={() => {
                   setEditedLinkUrl(linkUrl);
                   setEditMode(true);
                 }}
               >
                 <FaEdit />
-              </ToolbarButton>
-              <ToolbarButton
-                title="Remove link"
-                onClick={() => {
+              </TooltipButton>
+              <TooltipButton
+                tooltipMessage="Remove link"
+                onPress={() => {
                   editor.dispatchCommand(TOGGLE_LINK_COMMAND, null);
                 }}
               >
                 <FaTrash />
-              </ToolbarButton>
+              </TooltipButton>
             </div>
           </div>
         )}
