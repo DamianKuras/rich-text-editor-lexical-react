@@ -30,14 +30,12 @@ import {
   UNDO_COMMAND,
 } from "lexical";
 import { useCallback, useEffect, useLayoutEffect, useState } from "react";
-import { IconContext } from "react-icons";
 import {
   FaAlignCenter,
   FaAlignJustify,
   FaAlignLeft,
   FaAlignRight,
   FaBold,
-  FaFileCode,
   FaIndent,
   FaItalic,
   FaLink,
@@ -59,7 +57,6 @@ import {
   SAVE_TO_LOCAL_STORAGE,
 } from "../plugins/LocalStoragePlugin";
 
-import { TOGGLE_HTML_VISIBILITY_COMMAND } from "../plugins/ShowHtml";
 import { TooltipButton } from "../ui/TooltipButton";
 import { TooltipToggleButton } from "../ui/TooltipToggleButton";
 import { getSelectedNode } from "../utils/getSelectedNode";
@@ -298,190 +295,13 @@ export function ToolbarPlugin(): JSX.Element {
   }, [activeEditor, isLink]);
 
   return (
-    <div className="sticky top-0 z-10 flex justify-between bg-toolbar-background p-1">
-      <IconContext.Provider
-        value={{
-          className: "text-toolbar-text w-4 h-4 inline-block",
-        }}
-      >
-        <div className="flex">
-          <div className="border-r px-2">
-            <SettingsDropdown />
-          </div>
-
-          <div className="flex border-r px-2">
-            <TooltipButton
-              tooltipMessage="Undo (Ctrl+z)"
-              disabled={!canUndo}
-              onPress={handleUndo}
-            >
-              <FaUndo />
-            </TooltipButton>
-
-            <TooltipButton
-              tooltipMessage="Redo (Ctrl+y)"
-              disabled={!canRedo}
-              onPress={handleRedo}
-            >
-              <FaRedo />
-            </TooltipButton>
-          </div>
-          {activeEditor === editor && (
-            <div className="flex min-w-[8em] justify-center border-r px-1">
-              <div className="my-auto">
-                <BlockFormatSelect
-                  editor={editor}
-                  selectedBlockType={selectedBlockType}
-                />
-              </div>
-            </div>
-          )}
-
-          {selectedBlockType === "code" && (
-            <div className="flex min-w-[8em] justify-center border-r px-1">
-              <div className="my-auto">
-                <CodeLanguageSelect
-                  onCodeLanguageChange={handleCodeLangugeChange}
-                  selectedCodeLanguage={codeLanguage}
-                />
-              </div>
-            </div>
-          )}
-
-          <div className="flex border-r px-2">
-            <TooltipButton
-              tooltipMessage="Align left"
-              onPress={() => handleFormatElement("left")}
-            >
-              <FaAlignLeft />
-            </TooltipButton>
-
-            <TooltipButton
-              tooltipMessage="Align center"
-              onPress={() => handleFormatElement("center")}
-            >
-              <FaAlignCenter />
-            </TooltipButton>
-
-            <TooltipButton
-              tooltipMessage="Align right"
-              onPress={() => handleFormatElement("right")}
-            >
-              <FaAlignRight />
-            </TooltipButton>
-
-            <TooltipButton
-              tooltipMessage="Align justify"
-              onPress={() => handleFormatElement("justify")}
-            >
-              <FaAlignJustify />
-            </TooltipButton>
-
-            <TooltipButton
-              tooltipMessage="Indent"
-              onPress={() => handleIndent()}
-            >
-              <FaIndent />
-            </TooltipButton>
-
-            <TooltipButton
-              tooltipMessage="Outdent"
-              onPress={() => handleOutdent()}
-            >
-              <FaOutdent />
-            </TooltipButton>
-          </div>
-          {(selectedBlockType === "paragraph" ||
-            selectedBlockType === "h1" ||
-            selectedBlockType === "h2" ||
-            selectedBlockType === "h3" ||
-            selectedBlockType === "bullet" ||
-            selectedBlockType === "number" ||
-            selectedBlockType === "quote") && (
-            <>
-              <div className="flex border-r px-2">
-                <TooltipToggleButton
-                  tooltipMessage="Bold"
-                  selected={isBold}
-                  onPress={() => {
-                    handleFormatText("bold");
-                  }}
-                >
-                  <FaBold />
-                </TooltipToggleButton>
-
-                <TooltipToggleButton
-                  tooltipMessage="Italic"
-                  selected={isItalic}
-                  onPress={() => handleFormatText("italic")}
-                >
-                  <FaItalic />
-                </TooltipToggleButton>
-
-                <TooltipToggleButton
-                  tooltipMessage="Underline"
-                  selected={isUnderline}
-                  onPress={() => handleFormatText("underline")}
-                >
-                  <FaUnderline />
-                </TooltipToggleButton>
-
-                <TooltipToggleButton
-                  tooltipMessage="Link"
-                  selected={isLink}
-                  onPress={() => handleToggleLink()}
-                >
-                  <FaLink />
-                </TooltipToggleButton>
-
-                <TooltipToggleButton
-                  tooltipMessage="striketrough"
-                  selected={isStrikethrough}
-                  onPress={() => handleFormatText("strikethrough")}
-                >
-                  <FaStrikethrough />
-                </TooltipToggleButton>
-
-                <TooltipToggleButton
-                  tooltipMessage="Subscript"
-                  selected={isSubscript}
-                  onPress={() => handleFormatText("subscript")}
-                >
-                  <FaSubscript />
-                </TooltipToggleButton>
-
-                <TooltipToggleButton
-                  tooltipMessage="Superscript"
-                  selected={isSuperscript}
-                  onPress={() => handleFormatText("superscript")}
-                >
-                  <FaSuperscript />
-                </TooltipToggleButton>
-              </div>
-              <div className="flex px-2">
-                <TooltipButton
-                  tooltipMessage="Insert horizontal rule"
-                  onPress={() => handleInsertHorizontalRule()}
-                >
-                  <MdInsertPageBreak />
-                </TooltipButton>
-                <TooltipButton
-                  tooltipMessage="show/hide html"
-                  onPress={() => {
-                    editor.dispatchCommand(
-                      TOGGLE_HTML_VISIBILITY_COMMAND,
-                      undefined
-                    );
-                  }}
-                >
-                  <FaFileCode />
-                </TooltipButton>
-              </div>
-            </>
-          )}
+    <div className="flex justify-between ">
+      <div className="flex">
+        <div className="border-r px-2">
+          <SettingsDropdown />
         </div>
 
-        <div className="inline-flex items-center justify-center">
+        <div className="flex border-r px-2">
           <TooltipButton
             onPress={() => handleSaveToLocalStorage()}
             tooltipMessage="Save to local storage"
@@ -489,11 +309,171 @@ export function ToolbarPlugin(): JSX.Element {
             <FaSave />
           </TooltipButton>
           <div
-            className={saveStatus.style + " h-2 w-2 rounded-full"}
+            className={saveStatus.style + " h-2 w-2 rounded-full my-auto"}
             title={saveStatus.message}
           ></div>
         </div>
-      </IconContext.Provider>
+
+        <div className="flex border-r px-2">
+          <TooltipButton
+            tooltipMessage="Undo (Ctrl+z)"
+            disabled={!canUndo}
+            onPress={handleUndo}
+          >
+            <FaUndo />
+          </TooltipButton>
+
+          <TooltipButton
+            tooltipMessage="Redo (Ctrl+y)"
+            disabled={!canRedo}
+            onPress={handleRedo}
+          >
+            <FaRedo />
+          </TooltipButton>
+        </div>
+        {activeEditor === editor && (
+          <div className="flex min-w-[8em] justify-center border-r px-1">
+            <div className="my-auto">
+              <BlockFormatSelect
+                editor={editor}
+                selectedBlockType={selectedBlockType}
+              />
+            </div>
+          </div>
+        )}
+
+        {selectedBlockType === "code" && (
+          <div className="flex min-w-[8em] justify-center border-r px-1">
+            <div className="my-auto">
+              <CodeLanguageSelect
+                onCodeLanguageChange={handleCodeLangugeChange}
+                selectedCodeLanguage={codeLanguage}
+              />
+            </div>
+          </div>
+        )}
+
+        <div className="flex border-r px-2">
+          <TooltipButton
+            tooltipMessage="Align left"
+            onPress={() => handleFormatElement("left")}
+          >
+            <FaAlignLeft />
+          </TooltipButton>
+
+          <TooltipButton
+            tooltipMessage="Align center"
+            onPress={() => handleFormatElement("center")}
+          >
+            <FaAlignCenter />
+          </TooltipButton>
+
+          <TooltipButton
+            tooltipMessage="Align right"
+            onPress={() => handleFormatElement("right")}
+          >
+            <FaAlignRight />
+          </TooltipButton>
+
+          <TooltipButton
+            tooltipMessage="Align justify"
+            onPress={() => handleFormatElement("justify")}
+          >
+            <FaAlignJustify />
+          </TooltipButton>
+
+          <TooltipButton
+            tooltipMessage="Indent"
+            onPress={() => handleIndent()}
+          >
+            <FaIndent />
+          </TooltipButton>
+
+          <TooltipButton
+            tooltipMessage="Outdent"
+            onPress={() => handleOutdent()}
+          >
+            <FaOutdent />
+          </TooltipButton>
+        </div>
+        {(selectedBlockType === "paragraph" ||
+          selectedBlockType === "h1" ||
+          selectedBlockType === "h2" ||
+          selectedBlockType === "h3" ||
+          selectedBlockType === "bullet" ||
+          selectedBlockType === "number" ||
+          selectedBlockType === "quote") && (
+          <>
+            <div className="flex border-r px-2">
+              <TooltipToggleButton
+                tooltipMessage="Bold"
+                selected={isBold}
+                onPress={() => {
+                  handleFormatText("bold");
+                }}
+              >
+                <FaBold />
+              </TooltipToggleButton>
+
+              <TooltipToggleButton
+                tooltipMessage="Italic"
+                selected={isItalic}
+                onPress={() => handleFormatText("italic")}
+              >
+                <FaItalic />
+              </TooltipToggleButton>
+
+              <TooltipToggleButton
+                tooltipMessage="Underline"
+                selected={isUnderline}
+                onPress={() => handleFormatText("underline")}
+              >
+                <FaUnderline />
+              </TooltipToggleButton>
+
+              <TooltipToggleButton
+                tooltipMessage="Link"
+                selected={isLink}
+                onPress={() => handleToggleLink()}
+              >
+                <FaLink />
+              </TooltipToggleButton>
+
+              <TooltipToggleButton
+                tooltipMessage="striketrough"
+                selected={isStrikethrough}
+                onPress={() => handleFormatText("strikethrough")}
+              >
+                <FaStrikethrough />
+              </TooltipToggleButton>
+
+              <TooltipToggleButton
+                tooltipMessage="Subscript"
+                selected={isSubscript}
+                onPress={() => handleFormatText("subscript")}
+              >
+                <FaSubscript />
+              </TooltipToggleButton>
+
+              <TooltipToggleButton
+                tooltipMessage="Superscript"
+                selected={isSuperscript}
+                onPress={() => handleFormatText("superscript")}
+              >
+                <FaSuperscript />
+              </TooltipToggleButton>
+            </div>
+            <div className="flex pl-2">
+              <TooltipButton
+                tooltipMessage="Insert horizontal rule"
+                onPress={() => handleInsertHorizontalRule()}
+              >
+                <MdInsertPageBreak />
+              </TooltipButton>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }

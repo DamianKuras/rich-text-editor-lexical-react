@@ -12,6 +12,7 @@ import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { TabIndentationPlugin } from "@lexical/react/LexicalTabIndentationPlugin";
 import { HeadingNode, QuoteNode } from "@lexical/rich-text";
 import { useState } from "react";
+import { IconContext } from "react-icons";
 import { EditorTheme } from "./EditorTheme";
 import { ToolbarPlugin } from "./Toolbar";
 import { SettingsContext } from "./context/SettingsContext";
@@ -24,7 +25,7 @@ import {
   SAVE_TO_LOCAL_STORAGE,
   getSavedStateFromLocalStorage,
 } from "./plugins/LocalStoragePlugin";
-import { ShowHtml } from "./plugins/ShowHtml";
+import { ShowHtmlPlugin } from "./plugins/ShowHtmlPlugin";
 
 export type BlockType =
   | "paragraph"
@@ -70,7 +71,18 @@ export function Editor() {
         }}
       >
         <LexicalComposer initialConfig={initialConfig}>
-          <ToolbarPlugin />
+          <div className="sticky top-0 z-10 flex justify-between bg-gray-500 p-1">
+            <IconContext.Provider
+              value={{
+                className: "text-white-600 w-4 h-4 inline-block",
+              }}
+            >
+              <div className="flex max-w-full overflow-auto">
+                <ToolbarPlugin />
+                <ShowHtmlPlugin />
+              </div>
+            </IconContext.Provider>
+          </div>
           <div className="relative min-h-[200px] bg-editor-background ">
             <RichTextPlugin
               contentEditable={
@@ -94,7 +106,6 @@ export function Editor() {
           <LocalStoragePlugin />
           <CodeHighlightPlugin />
           <TabIndentationPlugin />
-          <ShowHtml />
           <AutoSavePlugin
             SaveCommand={SAVE_TO_LOCAL_STORAGE}
             AutoSaveEnabled={autoSaveEnabled}
