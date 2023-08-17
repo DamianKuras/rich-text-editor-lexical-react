@@ -297,7 +297,7 @@ export function ToolbarPlugin(): JSX.Element {
   return (
     <div className="flex justify-between ">
       <div className="flex">
-        <div className="border-r px-2">
+        <div className="my-auto border-r px-2">
           <SettingsDropdown />
         </div>
 
@@ -309,7 +309,7 @@ export function ToolbarPlugin(): JSX.Element {
             <FaSave />
           </TooltipButton>
           <div
-            className={saveStatus.style + " h-2 w-2 rounded-full my-auto"}
+            className={saveStatus.style + " my-auto h-2 w-2 rounded-full"}
             title={saveStatus.message}
           ></div>
         </div>
@@ -335,8 +335,9 @@ export function ToolbarPlugin(): JSX.Element {
           <div className="flex min-w-[8em] justify-center border-r px-1">
             <div className="my-auto">
               <BlockFormatSelect
-                editor={editor}
+                activeEditor={activeEditor}
                 selectedBlockType={selectedBlockType}
+                setSelectedBlockType={setSelectedBlockType}
               />
             </div>
           </div>

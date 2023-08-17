@@ -14,6 +14,26 @@
   }
 }
 
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes zoom {
+  from {
+    transform: scale(0.8);
+  }
+
+  to {
+    transform: scale(1);
+  }
+}
+
 .react-aria-Tooltip {
   &[data-placement="top"] {
     margin-bottom: 8px;
@@ -49,6 +69,62 @@
 
   &[data-exiting] {
     animation: slide 200ms reverse ease-in;
+  }
+}
+
+.react-aria-Popover {
+  outline: none;
+  &[data-placement="top"] {
+    margin-bottom: 6px;
+    --origin: translateY(8px);
+  }
+
+  &[data-placement="bottom"] {
+    margin-top: 6px;
+    --origin: translateY(-8px);
+    & .react-aria-OverlayArrow svg {
+      transform: rotate(180deg);
+    }
+  }
+
+  &[data-placement="right"] {
+    margin-left: 6px;
+    --origin: translateX(-8px);
+    & .react-aria-OverlayArrow svg {
+      transform: rotate(90deg);
+    }
+  }
+
+  &[data-placement="left"] {
+    margin-right: 6px;
+    --origin: translateX(8px);
+    & .react-aria-OverlayArrow svg {
+      transform: rotate(-90deg);
+    }
+  }
+
+  &[data-entering] {
+    animation: slide 200ms;
+  }
+
+  &[data-exiting] {
+    animation: slide 200ms reverse ease-in;
+  }
+}
+
+.react-aria-ModalOverlay {
+  &[data-entering] {
+    animation: fade 200ms;
+  }
+
+  &[data-exiting] {
+    animation: fade 150ms reverse ease-in;
+  }
+}
+
+.react-aria-Modal {
+  &[data-entering] {
+    animation: zoom 300ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
 }
 

@@ -1,20 +1,21 @@
 import { CODE_LANGUAGE_FRIENDLY_NAME_MAP } from "@lexical/code";
-import { Select, SelectItem } from "../ui/Select";
+import { SelectItem, ToolbarSelect } from "../ui/ToolbarSelect";
 
 type CodeLanguageSelectProps = {
   onCodeLanguageChange: (language: string) => void;
   selectedCodeLanguage: string;
 };
-const selectItems: Map<string, SelectItem<string>> = Object.entries(
+type Option = {
+  id: string;
+  name: string;
+};
+
+const selectItems: Option[] = Object.entries(
   CODE_LANGUAGE_FRIENDLY_NAME_MAP
-).reduce((map, [lang, friendlyName]) => {
-  map.set(lang, {
-    key: lang,
-    selectedLabel: <span>{friendlyName}</span>,
-    label: <span className="text-sm">{friendlyName}</span>,
-  });
-  return map;
-}, new Map<string, SelectItem<string>>());
+).map(([lang, friendlyName]) => ({
+  id: lang,
+  name: friendlyName,
+}));
 
 export function CodeLanguageSelect({
   onCodeLanguageChange,
@@ -27,13 +28,18 @@ export function CodeLanguageSelect({
     onCodeLanguageChange(language);
   };
   return (
-    <Select
-      selectItems={selectItems}
-      selectedItemKey={selectedCodeLanguage}
-      defaultItemKey={"js"}
-      onSelect={
-        handleCodeLanguageSelection as (language: string) => void
-      }
-    />
+    <ToolbarSelect
+      aria-label="code language select"
+      items={selectItems}
+      selectedKey={selectedCodeLanguage}
+      defaultSelectedKey={"js"}
+      key={"code-language-select"}
+      minWidth="[8em]"
+      onSelectionChange={(selected) => {
+        handleCodeLanguageSelection(selected as string);
+      }}
+    >
+      {(item) => SelectItem(item)}
+    </ToolbarSelect>
   );
 }
