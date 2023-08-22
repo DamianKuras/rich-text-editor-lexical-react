@@ -27,15 +27,15 @@ import {
 } from "lexical";
 import * as React from "react";
 import { Dispatch, useCallback, useEffect, useRef, useState } from "react";
+import { Input, TextField } from "react-aria-components";
 import { createPortal } from "react-dom";
 import { IconContext } from "react-icons";
 import { FaEdit, FaTrash } from "react-icons/fa";
-import { GiCancel, GiConfirmed } from "react-icons/gi";
-import { FloatingLabelInput } from "../ui/FloatingLabelInput";
+import { VscCheck, VscChromeClose } from "react-icons/vsc";
+import { TooltipButton } from "../ui/TooltipButton";
 import { getSelectedNode } from "../utils/getSelectedNode";
 import { setFloatingElemPositionForLinkEditor } from "../utils/setFloatingElemPositionForLinkEditor";
 import { sanitizeUrl } from "../utils/url";
-import { TooltipButton } from "../ui/TooltipButton";
 
 function FloatingLinkEditor({
   editor,
@@ -196,58 +196,57 @@ function FloatingLinkEditor({
   return (
     <IconContext.Provider
       value={{
-        className: "text-toolbar-text w-4 h-4 inline-block",
+        className: "text-white-600 w-4 h-4 inline-block",
       }}
     >
       <div
         ref={editorRef}
-        className="absolute left-0 top-0 z-10 w-full max-w-[400px] translate-y-0 transform rounded-lg bg-toolbar-background opacity-0 shadow-md transition-opacity duration-500"
+        className="absolute left-0 top-0 z-10 flex w-full max-w-[400px] translate-y-0 transform overflow-auto bg-gray-500 opacity-0 shadow-md transition-opacity duration-500"
       >
         {!isLink ? null : isEditMode ? (
-          <div className="relative block flex items-center justify-between px-4 py-2">
-            <div className="min-w-[300px]">
-              <FloatingLabelInput
-                label="Link URL"
-                id="link url"
-                type="text"
+          <div className="block flex w-full justify-between p-2">
+            <TextField className="flex w-full text-white-600 ">
+              <Input
+                className="mr-2 w-full bg-gray-800 p-2 text-white-600 outline-none"
+                aria-label="Link URL:"
                 value={editedLinkUrl}
+                onKeyDown={monitorInputInteraction}
                 onChange={(event) => {
                   setEditedLinkUrl(event.target.value);
                 }}
-                onKeyDown={(event) => {
-                  monitorInputInteraction(event);
-                }}
               />
-            </div>
-            <div>
-              <TooltipButton
-                tooltipMessage="Cancel link"
-                onPress={() => setEditMode(false)}
-              >
-                <GiCancel />
-              </TooltipButton>
-
+            </TextField>
+            <div className="flex">
               <TooltipButton
                 tooltipMessage="confirm link"
+                className="mr-2 bg-green-500 hover:bg-green-300"
                 onPress={handleLinkSubmission}
               >
-                <GiConfirmed />
+                <VscCheck />
+              </TooltipButton>
+              <TooltipButton
+                tooltipMessage="Cancel link"
+                className="bg-red-500 hover:bg-red-300"
+                onPress={() => setEditMode(false)}
+              >
+                <VscChromeClose />
               </TooltipButton>
             </div>
           </div>
         ) : (
-          <div className="relative block flex items-center justify-between px-4 py-2">
+          <div className="relative block flex w-full justify-between p-2">
             <a
               href={sanitizeUrl(linkUrl)}
               target="_blank"
               rel="noopener noreferrer"
-              className="my-auto text-link"
+              className="my-auto p-2 text-blue-500"
             >
               {linkUrl}
             </a>
-            <div>
+            <div className="flex">
               <TooltipButton
                 tooltipMessage="Edit link"
+                className="mr-2 bg-green-500 hover:bg-green-300"
                 onPress={() => {
                   setEditedLinkUrl(linkUrl);
                   setEditMode(true);
@@ -257,6 +256,7 @@ function FloatingLinkEditor({
               </TooltipButton>
               <TooltipButton
                 tooltipMessage="Remove link"
+                className="bg-red-500 hover:bg-red-300"
                 onPress={() => {
                   editor.dispatchCommand(TOGGLE_LINK_COMMAND, null);
                 }}

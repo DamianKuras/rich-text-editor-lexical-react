@@ -61,18 +61,21 @@ import {
 
 import { TooltipButton } from "../ui/TooltipButton";
 import { TooltipToggleButton } from "../ui/TooltipToggleButton";
+import {
+  InsertParagraphAfterElement,
+  InsertParagraphBeforeElement,
+} from "../utils/InsertParagraph";
 import { getSelectedNode } from "../utils/getSelectedNode";
 import { sanitizeUrl } from "../utils/url";
 import { BlockFormatSelect } from "./BlockFormatSelect";
 import { CodeLanguageSelect } from "./CodeLanguageSelect";
 import { SettingsPopover } from "./SettingsPopover";
-import { InsertParagraphAfterElement, InsertParagraphBeforeElement } from "../utils/InsertParagraph";
 
 export function ToolbarPlugin(): JSX.Element {
   const [editor] = useLexicalComposerContext();
   const [activeEditor, setActiveEditor] = useState(editor);
   const [saveStatus, setSaveStatus] = useState({
-    style: "bg-success",
+    style: "bg-green-500",
     message: "Saved to local storage",
   });
   const [canUndo, setCanUndo] = useState(false);
@@ -137,7 +140,6 @@ export function ToolbarPlugin(): JSX.Element {
           return;
         }
       }
-      console.log(selection.hasFormat("bold"));
       setIsBold(selection.hasFormat("bold"));
       setIsItalic(selection.hasFormat("italic"));
       setIsUnderline(selection.hasFormat("underline"));
@@ -166,7 +168,7 @@ export function ToolbarPlugin(): JSX.Element {
           return;
         }
         setSaveStatus({
-          style: "bg-unsaved",
+          style: "bg-yellow-500",
           message: "Unsaved",
         });
       }
@@ -194,13 +196,13 @@ export function ToolbarPlugin(): JSX.Element {
       (payload) => {
         if (payload === SAVED_SUCCESSFULLY_TO_LOCAL_STORAGE) {
           setSaveStatus({
-            style: "bg-success",
+            style: "bg-green-500",
             message: "Saved to local storage",
           });
         }
         if (payload === FAILED_TO_SAVE_TO_LOCAL_STORAGE) {
           setSaveStatus({
-            style: "bg-error",
+            style: "bg-red-500",
             message:
               "Failed to save to local storage. Check if browser has local storage enabled.",
           });

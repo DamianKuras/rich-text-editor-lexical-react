@@ -78,28 +78,28 @@ export function ShowHtmlPlugin() {
       </TooltipButton>
       <ModalOverlay
         isDismissable={true}
-        className="react-aria-ModalOverlay fixed left-0 top-0 z-50 flex h-screen w-screen items-center justify-center bg-slate-500 bg-opacity-80"
+        className="react-aria-ModalOverlay fixed left-0 top-0 z-50 flex h-screen w-screen items-center justify-center bg-blue-200 bg-opacity-60"
       >
         <Modal
           isOpen={isOpen}
           onOpenChange={setOpen}
           className="react-aria-Modal "
         >
-          <Dialog className="z-50 mx-auto my-auto max-h-[80vh] min-w-[30em] max-w-[80vw] overflow-auto bg-page-background outline-none">
+          <Dialog className="z-50 mx-auto my-auto max-h-[80vh] min-w-[30em] max-w-[80vw] overflow-auto bg-gray-800 outline-none">
             {({ close }) => (
               <>
-                <div className="sticky top-0 z-10 flex justify-between bg-toolbar-background p-2">
-                  <Heading className="text-3xl text-toolbar-text">Html</Heading>
+                <div className="sticky top-0 z-10 flex justify-between bg-gray-700 p-2">
+                  <Heading className="text-3xl text-white-600">Html</Heading>
                   <div className="flex gap-2">
                     {isCopied ? (
-                      <div className="flex items-center bg-primary px-2 py-1">
+                      <div className="flex items-center bg-green-500 px-2 py-1">
                         <BiCheck />
                       </div>
                     ) : (
                       <TooltipButton
                         tooltipMessage="Copy to clipboard"
                         onPress={handleCopyClick}
-                        className="hover:bg-primary-hover bg-primary text-toolbar-text"
+                        className="bg-green-500 text-white-600 hover:bg-green-300"
                         disabled={isCopied}
                       >
                         <FaCopy />
@@ -108,15 +108,15 @@ export function ShowHtmlPlugin() {
                     <TooltipButton
                       tooltipMessage="Close overlay"
                       onPress={close}
-                      className="bg-error  text-toolbar-text"
+                      className="bg-red-500 text-white-600 hover:bg-red-300"
                     >
                       <VscChromeClose />
                     </TooltipButton>
                   </div>
                 </div>
 
-                <div className="bg-editor-background ">
-                  <pre className="whitespace-pre-wrap break-all p-4 text-editor-text">
+                <div className="bg-gray-500">
+                  <pre className="whitespace-pre-wrap break-all p-4 text-white-600">
                     {htmlContent}
                   </pre>
                 </div>

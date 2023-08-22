@@ -86,13 +86,18 @@ export function Editor() {
               </div>
             </IconContext.Provider>
           </div>
-          <div className="relative min-h-[200px] bg-editor-background ">
+          <div className="relative bg-gray-700">
             <RichTextPlugin
               contentEditable={
-                <ContentEditable className="px-8 py-8 text-editor-text focus:outline-none" />
+                <div className="relative z-0 flex w-full resize-y overflow-auto">
+                  <ContentEditable
+                    className="w-full px-8 py-8 text-gray-100 focus:outline-none "
+                    spellCheck={spellcheck}
+                  />
+                </div>
               }
               placeholder={
-                <div className="pointer-events-none absolute left-8 top-8 select-none text-disabled">
+                <div className="pointer-events-none absolute left-8 top-8 select-none text-gray-300">
                   Enter some text...
                 </div>
               }

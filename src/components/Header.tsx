@@ -2,10 +2,10 @@ import { IconContext } from "react-icons";
 import { ImGithub } from "react-icons/im";
 export function Header() {
   return (
-    <header className="p-10 text-header-text">
+    <header className="p-10 text-white-800">
       <h1 className="text-center text-3xl font-medium">
-        <span className="text-primary">Rich Text Editor</span> using Lexical and
-        React
+        <span className="text-green-500">Rich Text Editor</span> using Lexical
+        and React
       </h1>
       <div className="my-6 text-center">
         <a
@@ -15,9 +15,7 @@ export function Header() {
           className="inline-flex items-center"
         >
           <span className="mr-2">Check out project on Github</span>
-          <IconContext.Provider
-            value={{ className: "text-header-text w-6 h-6 inline-block" }}
-          >
+          <IconContext.Provider value={{ className: "w-6 h-6 inline-block" }}>
             <ImGithub />
           </IconContext.Provider>
         </a>

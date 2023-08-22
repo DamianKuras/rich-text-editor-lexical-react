@@ -1,7 +1,7 @@
 export const EditorTheme = {
   ltr: "text-left",
   rtl: "text-right",
-  paragraph: "mb-4",
+  paragraph: "mb-4 last:mb-0",
   text: {
     bold: "font-bold",
     italic: "italic",
@@ -11,9 +11,9 @@ export const EditorTheme = {
   },
   quote: "border-l-4 my-4 text-lg ml-4 pl-4",
   heading: {
-    h1: "text-2xl",
-    h2: "text-xl",
-    h3: "text-lg",
+    h1: "text-3xl mb-4",
+    h2: "text-xl mb-4",
+    h3: "text-lg mb-4",
   },
   list: {
     listitem: "mb-2",
@@ -29,7 +29,7 @@ export const EditorTheme = {
     ],
     ul: "list-disc ml-4",
   },
-  code: "block leading-6 bg-code-background py-2 font-mono block pl-10 relative whitespace-pre-wrap before:py-2 before:text-disabled before:content-[attr(data-gutter)] before:absolute before:top-0 before:left-0 before:border-disabled before:border-r before:pr-2 before:pl-4 ",
+  code: "block leading-6 bg-gray-800 py-2 font-mono block pl-10 relative whitespace-pre-wrap before:py-2 before:text-disabled before:content-[attr(data-gutter)] before:absolute before:top-0 before:left-0 before:border-disabled before:border-r before:pr-2 before:pl-4 mb-2",
   codeHighlight: {
     atrule: "text-code-highlight-atrule",
     attr: "text-code-highlight-attr",
@@ -62,5 +62,5 @@ export const EditorTheme = {
     url: "text-code-highlight-url",
     variable: "text-code-highlight-variable",
   },
-  link: "text-link",
+  link: "text-blue-500",
 };
