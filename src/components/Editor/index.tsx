@@ -58,7 +58,8 @@ export function Editor() {
   };
 
   const [autoSaveEnabled, setAutoSaveEnabled] = useState(true);
-  const [autoSaveInterval, setAutoSaveInterval] = useState(3000);
+  const [autoSaveInterval, setAutoSaveInterval] = useState(3);
+  const [spellcheck, setSpellcheck] = useState(true);
 
   return (
     <div className="mx-auto w-full max-w-5xl">
@@ -66,8 +67,10 @@ export function Editor() {
         value={{
           autoSaveEnabled: autoSaveEnabled,
           autoSaveInterval: autoSaveInterval,
+          spellcheck: spellcheck,
           setAutoSaveEnabled,
           setAutoSaveInterval,
+          setSpellcheck,
         }}
       >
         <LexicalComposer initialConfig={initialConfig}>

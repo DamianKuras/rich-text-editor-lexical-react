@@ -27,9 +27,9 @@ export function TooltipButton({
         isDisabled={disabled}
         className={`${
           className ? className + " " : ""
-        } flex items-center px-2 py-1 ${
+        } flex items-center px-2 py-1 outline-none data-[pressed]:bg-gray-700 ${
           disabled ? "[&>svg]:text-gray-300" : "hover:bg-gray-700"
-        } `}
+        }  `}
         onPress={onPress}
       >
         {children}

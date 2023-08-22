@@ -38,6 +38,8 @@ import {
   FaBold,
   FaIndent,
   FaItalic,
+  FaLevelDownAlt,
+  FaLevelUpAlt,
   FaLink,
   FaOutdent,
   FaRedo,
@@ -63,7 +65,8 @@ import { getSelectedNode } from "../utils/getSelectedNode";
 import { sanitizeUrl } from "../utils/url";
 import { BlockFormatSelect } from "./BlockFormatSelect";
 import { CodeLanguageSelect } from "./CodeLanguageSelect";
-import { SettingsDropdown } from "./SettingsDropdown";
+import { SettingsPopover } from "./SettingsPopover";
+import { InsertParagraphAfterElement, InsertParagraphBeforeElement } from "../utils/InsertParagraph";
 
 export function ToolbarPlugin(): JSX.Element {
   const [editor] = useLexicalComposerContext();
@@ -297,10 +300,9 @@ export function ToolbarPlugin(): JSX.Element {
   return (
     <div className="flex justify-between ">
       <div className="flex">
-        <div className="my-auto border-r px-2">
-          <SettingsDropdown />
+        <div className="flex border-r px-2">
+          <SettingsPopover />
         </div>
-
         <div className="flex border-r px-2">
           <TooltipButton
             onPress={() => handleSaveToLocalStorage()}
@@ -470,6 +472,22 @@ export function ToolbarPlugin(): JSX.Element {
                 onPress={() => handleInsertHorizontalRule()}
               >
                 <MdInsertPageBreak />
+              </TooltipButton>
+              <TooltipButton
+                tooltipMessage="Insert paragraph before"
+                onPress={() => {
+                  InsertParagraphBeforeElement(editor);
+                }}
+              >
+                <FaLevelUpAlt />
+              </TooltipButton>
+              <TooltipButton
+                tooltipMessage="Insert paragraph after"
+                onPress={() => {
+                  InsertParagraphAfterElement(editor);
+                }}
+              >
+                <FaLevelDownAlt />
               </TooltipButton>
             </div>
           </>

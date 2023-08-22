@@ -30,7 +30,9 @@ export function ToolbarSelect<T extends object>({
       {...props}
       className="inline-block w-fit"
     >
-      <Button className={`min-w-${minWidth} px-4 py-2 outline-none`}>
+      <Button
+        className={`min-w-${minWidth} px-4 py-2 outline-none data-[pressed]:bg-gray-700`}
+      >
         <SelectValue className="text-sm text-white-600" />
         <span aria-hidden="true">
           <IoMdArrowDropdown />

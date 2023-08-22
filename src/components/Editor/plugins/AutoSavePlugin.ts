@@ -26,7 +26,7 @@ export function AutoSavePlugin({
 
   useEffect(() => {
     if (AutoSaveEnabled) {
-      saveTimerRef.current = setInterval(handleSave, AutoSaveInterval);
+      saveTimerRef.current = setInterval(handleSave, 1000 * AutoSaveInterval);
     }
     return () => {
       if (saveTimerRef.current) {

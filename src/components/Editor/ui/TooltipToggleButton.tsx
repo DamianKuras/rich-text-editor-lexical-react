@@ -8,7 +8,7 @@ import {
 
 type Props = {
   tooltipMessage: string;
-  onPress: () => void;
+  onPress?: () => void;
   className?: string;
   children: ReactNode;
   disabled?: boolean;
@@ -30,7 +30,7 @@ export function TooltipToggleButton({
         isSelected={selected}
         className={`${className ? className + " " : ""}px-2 pb-2 pt-1 ${
           disabled ? "[&>svg]:text-gray-300" : "hover:bg-gray-700"
-        } ${selected ? "bg-gray-600" : ""}`}
+        } ${selected ? "bg-gray-700" : ""}`}
         onPress={onPress}
       >
         {children}

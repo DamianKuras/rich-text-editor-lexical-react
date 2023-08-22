@@ -85,7 +85,7 @@ export function ShowHtmlPlugin() {
           onOpenChange={setOpen}
           className="react-aria-Modal "
         >
-          <Dialog className="z-50 mx-auto my-auto max-h-[80vh] min-w-[30em] max-w-[80vw] overflow-auto bg-page-background">
+          <Dialog className="z-50 mx-auto my-auto max-h-[80vh] min-w-[30em] max-w-[80vw] overflow-auto bg-page-background outline-none">
             {({ close }) => (
               <>
                 <div className="sticky top-0 z-10 flex justify-between bg-toolbar-background p-2">
