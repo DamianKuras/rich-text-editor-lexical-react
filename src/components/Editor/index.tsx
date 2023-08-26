@@ -11,21 +11,17 @@ import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { TabIndentationPlugin } from "@lexical/react/LexicalTabIndentationPlugin";
 import { HeadingNode, QuoteNode } from "@lexical/rich-text";
-import { useState } from "react";
 import { IconContext } from "react-icons";
 import { EditorTheme } from "./EditorTheme";
 import { ToolbarPlugin } from "./Toolbar";
-import { SettingsContext } from "./context/SettingsContext";
-import { AutoSavePlugin } from "./plugins/AutoSavePlugin";
+import { SettingsPopover } from "./Toolbar/SettingsPopover";
+import { useSettingsContext } from "./context/SettingsContext";
 import CodeHighlightPlugin from "./plugins/CodeHighlightPlugin";
 import FloatingLinkEditorPlugin from "./plugins/FloatingLinkEditorPlugin";
 import LinkPlugin from "./plugins/LinkPlugin";
-import {
-  LocalStoragePlugin,
-  SAVE_TO_LOCAL_STORAGE,
-  getSavedStateFromLocalStorage,
-} from "./plugins/LocalStoragePlugin";
 import { ShowHtmlPlugin } from "./plugins/ShowHtmlPlugin";
+import LocalStorage from "./plugins/StoragePlugin/LocalStorage";
+import StoragePlugin from "./plugins/StoragePlugin/StoragePlugin";
 
 export type BlockType =
   | "paragraph"
@@ -39,7 +35,6 @@ export type BlockType =
 
 export function Editor() {
   const initialConfig = {
-    editorState: getSavedStateFromLocalStorage(),
     namespace: "rich-text-editor",
     theme: EditorTheme,
     onError(error: Error) {
@@ -57,70 +52,55 @@ export function Editor() {
     ],
   };
 
-  const [autoSaveEnabled, setAutoSaveEnabled] = useState(true);
-  const [autoSaveInterval, setAutoSaveInterval] = useState(3);
-  const [spellcheck, setSpellcheck] = useState(true);
+  const { spellcheck } = useSettingsContext();
+  const storage = new LocalStorage();
 
   return (
     <div className="mx-auto w-full max-w-5xl">
-      <SettingsContext.Provider
-        value={{
-          autoSaveEnabled: autoSaveEnabled,
-          autoSaveInterval: autoSaveInterval,
-          spellcheck: spellcheck,
-          setAutoSaveEnabled,
-          setAutoSaveInterval,
-          setSpellcheck,
-        }}
-      >
-        <LexicalComposer initialConfig={initialConfig}>
-          <div className="sticky top-0 z-10 flex justify-between bg-gray-500 p-1">
-            <IconContext.Provider
-              value={{
-                className: "text-white-600 w-4 h-4 inline-block",
-              }}
-            >
-              <div className="flex max-w-full overflow-auto">
-                <ToolbarPlugin />
-                <ShowHtmlPlugin />
+      <LexicalComposer initialConfig={initialConfig}>
+        <div className="sticky top-0 z-10 flex justify-between bg-gray-500 p-1">
+          <IconContext.Provider
+            value={{
+              className: "text-white-600 w-4 h-4 inline-block",
+            }}
+          >
+            <div className="flex max-w-full overflow-auto">
+              <div className="flex border-r px-2">
+                <SettingsPopover />
               </div>
-            </IconContext.Provider>
-          </div>
-          <div className="relative bg-gray-700">
-            <RichTextPlugin
-              contentEditable={
-                <div className="relative z-0 flex w-full resize-y overflow-auto">
-                  <ContentEditable
-                    className="w-full px-8 py-8 text-gray-100 focus:outline-none "
-                    spellCheck={spellcheck}
-                  />
-                </div>
-              }
-              placeholder={
-                <div className="pointer-events-none absolute left-8 top-8 select-none text-gray-300">
-                  Enter some text...
-                </div>
-              }
-              ErrorBoundary={LexicalErrorBoundary}
-            />
-          </div>
-
-          <HistoryPlugin />
-          <HorizontalRulePlugin />
-          <LinkPlugin />
-
-          <FloatingLinkEditorPlugin />
-          <ListPlugin />
-          <LocalStoragePlugin />
-          <CodeHighlightPlugin />
-          <TabIndentationPlugin />
-          <AutoSavePlugin
-            SaveCommand={SAVE_TO_LOCAL_STORAGE}
-            AutoSaveEnabled={autoSaveEnabled}
-            AutoSaveInterval={autoSaveInterval}
+              <StoragePlugin storage={storage} />
+              <ToolbarPlugin />
+              <ShowHtmlPlugin />
+            </div>
+          </IconContext.Provider>
+        </div>
+        <div className="relative bg-gray-700">
+          <RichTextPlugin
+            contentEditable={
+              <div className="relative z-0 flex w-full resize-y overflow-auto">
+                <ContentEditable
+                  className="w-full px-8 py-8 text-gray-100 focus:outline-none "
+                  spellCheck={spellcheck}
+                />
+              </div>
+            }
+            placeholder={
+              <div className="pointer-events-none absolute left-8 top-8 select-none text-gray-300">
+                Enter some text...
+              </div>
+            }
+            ErrorBoundary={LexicalErrorBoundary}
           />
-        </LexicalComposer>
-      </SettingsContext.Provider>
+        </div>
+
+        <HistoryPlugin />
+        <HorizontalRulePlugin />
+        <LinkPlugin />
+        <FloatingLinkEditorPlugin />
+        <ListPlugin />
+        <CodeHighlightPlugin />
+        <TabIndentationPlugin />
+      </LexicalComposer>
     </div>
   );
 }

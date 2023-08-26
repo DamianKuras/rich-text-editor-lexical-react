@@ -9,7 +9,7 @@ export const EditorTheme = {
     underline: "underline",
     underlineStrikethrough: "custom-underline-strikethrough",
   },
-  quote: "border-l-4 my-4 text-lg ml-4 pl-4",
+  quote: "border-l-4 my-4 text-lg ml-4 pl-4 italic font-semibold",
   heading: {
     h1: "text-3xl mb-4",
     h2: "text-xl mb-4",
@@ -22,12 +22,12 @@ export const EditorTheme = {
     },
     olDepth: [
       "list-inside list-decimal",
-      "pl-4 list-inside list-decimal",
-      "pl-8 list-inside list-decimal",
-      "pl-12 list-inside list-decimal",
-      "pl-16 list-inside list-decimal",
+      "pl-4 list-inside list-[upper-alpha]",
+      "pl-8 list-inside list-[lower-alpha]",
+      "pl-12 list-inside list-[upper-roman]",
+      "pl-16 list-inside list-[lower-roman]",
     ],
-    ul: "list-disc ml-4",
+    ul: "list-inside list-disc ml-4",
   },
   code: "block leading-6 bg-gray-800 py-2 font-mono block pl-10 relative whitespace-pre-wrap before:py-2 before:text-disabled before:content-[attr(data-gutter)] before:absolute before:top-0 before:left-0 before:border-disabled before:border-r before:pr-2 before:pl-4 mb-2",
   codeHighlight: {

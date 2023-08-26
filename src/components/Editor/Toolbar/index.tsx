@@ -17,7 +17,6 @@ import {
   CAN_REDO_COMMAND,
   CAN_UNDO_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
-  COMMAND_PRIORITY_LOW,
   ElementFormatType,
   FORMAT_ELEMENT_COMMAND,
   FORMAT_TEXT_COMMAND,
@@ -29,7 +28,7 @@ import {
   TextFormatType,
   UNDO_COMMAND,
 } from "lexical";
-import { useCallback, useEffect, useLayoutEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   FaAlignCenter,
   FaAlignJustify,
@@ -43,7 +42,6 @@ import {
   FaLink,
   FaOutdent,
   FaRedo,
-  FaSave,
   FaStrikethrough,
   FaSubscript,
   FaSuperscript,
@@ -52,13 +50,6 @@ import {
 } from "react-icons/fa";
 import { MdInsertPageBreak } from "react-icons/md";
 import { BlockType } from "../index";
-import {
-  FAILED_TO_SAVE_TO_LOCAL_STORAGE,
-  LOCAL_STORAGE_SAVE_STATUS,
-  SAVED_SUCCESSFULLY_TO_LOCAL_STORAGE,
-  SAVE_TO_LOCAL_STORAGE,
-} from "../plugins/LocalStoragePlugin";
-
 import { TooltipButton } from "../ui/TooltipButton";
 import { TooltipToggleButton } from "../ui/TooltipToggleButton";
 import {
@@ -69,15 +60,14 @@ import { getSelectedNode } from "../utils/getSelectedNode";
 import { sanitizeUrl } from "../utils/url";
 import { BlockFormatSelect } from "./BlockFormatSelect";
 import { CodeLanguageSelect } from "./CodeLanguageSelect";
-import { SettingsPopover } from "./SettingsPopover";
 
 export function ToolbarPlugin(): JSX.Element {
   const [editor] = useLexicalComposerContext();
   const [activeEditor, setActiveEditor] = useState(editor);
-  const [saveStatus, setSaveStatus] = useState({
-    style: "bg-green-500",
-    message: "Saved to local storage",
-  });
+  // const [saveStatus, setSaveStatus] = useState({
+  //   style: "bg-green-500",
+  //   message: "Saved to local storage",
+  // });
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
   const [selectedElementKey, setSelectedElementKey] = useState<NodeKey | null>(
@@ -157,24 +147,6 @@ export function ToolbarPlugin(): JSX.Element {
     }
   }, [activeEditor]);
 
-  useLayoutEffect(() => {
-    return editor.registerUpdateListener(
-      ({ dirtyElements, dirtyLeaves, prevEditorState, tags }) => {
-        if (
-          (dirtyElements.size === 0 && dirtyLeaves.size === 0) ||
-          prevEditorState.isEmpty() ||
-          tags.has("history-merge")
-        ) {
-          return;
-        }
-        setSaveStatus({
-          style: "bg-yellow-500",
-          message: "Unsaved",
-        });
-      }
-    );
-  }, [editor]);
-
   useEffect(() => {
     return editor.registerCommand(
       SELECTION_CHANGE_COMMAND,
@@ -189,29 +161,6 @@ export function ToolbarPlugin(): JSX.Element {
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editor, updateToolbarSelections]);
-
-  useEffect(() => {
-    return editor.registerCommand<string>(
-      LOCAL_STORAGE_SAVE_STATUS,
-      (payload) => {
-        if (payload === SAVED_SUCCESSFULLY_TO_LOCAL_STORAGE) {
-          setSaveStatus({
-            style: "bg-green-500",
-            message: "Saved to local storage",
-          });
-        }
-        if (payload === FAILED_TO_SAVE_TO_LOCAL_STORAGE) {
-          setSaveStatus({
-            style: "bg-red-500",
-            message:
-              "Failed to save to local storage. Check if browser has local storage enabled.",
-          });
-        }
-        return true;
-      },
-      COMMAND_PRIORITY_LOW
-    );
-  }, [editor]);
 
   useEffect(() => {
     return mergeRegister(
@@ -284,10 +233,6 @@ export function ToolbarPlugin(): JSX.Element {
     activeEditor.dispatchCommand(INSERT_HORIZONTAL_RULE_COMMAND, undefined);
   };
 
-  const handleSaveToLocalStorage = () => {
-    editor.dispatchCommand(SAVE_TO_LOCAL_STORAGE, undefined);
-  };
-
   const handleToggleLink = useCallback(() => {
     if (!isLink) {
       activeEditor.dispatchCommand(
@@ -300,24 +245,7 @@ export function ToolbarPlugin(): JSX.Element {
   }, [activeEditor, isLink]);
 
   return (
-    <div className="flex justify-between ">
       <div className="flex">
-        <div className="flex border-r px-2">
-          <SettingsPopover />
-        </div>
-        <div className="flex border-r px-2">
-          <TooltipButton
-            onPress={() => handleSaveToLocalStorage()}
-            tooltipMessage="Save to local storage"
-          >
-            <FaSave />
-          </TooltipButton>
-          <div
-            className={saveStatus.style + " my-auto h-2 w-2 rounded-full"}
-            title={saveStatus.message}
-          ></div>
-        </div>
-
         <div className="flex border-r px-2">
           <TooltipButton
             tooltipMessage="Undo (Ctrl+z)"
@@ -495,6 +423,5 @@ export function ToolbarPlugin(): JSX.Element {
           </>
         )}
       </div>
-    </div>
   );
 }

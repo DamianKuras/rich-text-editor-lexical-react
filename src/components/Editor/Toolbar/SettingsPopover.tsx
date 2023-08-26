@@ -1,4 +1,3 @@
-import { useContext } from "react";
 import {
   Dialog,
   DialogTrigger,
@@ -10,7 +9,7 @@ import {
   SliderTrack,
 } from "react-aria-components";
 import { IoSettingsSharp } from "react-icons/io5";
-import { SettingsContext } from "../context/SettingsContext";
+import { useSettingsContext } from "../context/SettingsContext";
 import { ToolbarSwitch } from "../ui/ToolbarSwitch";
 import { TooltipButton } from "../ui/TooltipButton";
 
@@ -22,7 +21,7 @@ export function SettingsPopover() {
     setAutoSaveInterval,
     spellcheck,
     setSpellcheck,
-  } = useContext(SettingsContext);
+  } = useSettingsContext();
 
   const handleAutoSaveEnabledChange = () => {
     setAutoSaveEnabled(!autoSaveEnabled);
@@ -32,7 +31,7 @@ export function SettingsPopover() {
     setSpellcheck(!spellcheck);
   };
   return (
-    <div className="b-2 flex border-toolbar-disabled">
+    <div className="b-2 border-toolbar-disabled flex">
       <DialogTrigger>
         <TooltipButton tooltipMessage="Settings">
           <IoSettingsSharp />

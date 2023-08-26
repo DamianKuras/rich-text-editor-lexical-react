@@ -30,11 +30,11 @@ const formatHeading = (
   });
 };
 
-interface BlockFormatSelectProps {
+type BlockFormatSelectProps = {
   activeEditor: LexicalEditor;
   selectedBlockType: BlockType;
   setSelectedBlockType: (type: BlockType) => void;
-}
+};
 
 type Option = {
   id: BlockType;
