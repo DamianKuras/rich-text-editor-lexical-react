@@ -9,9 +9,8 @@ import {
   Modal,
   ModalOverlay,
 } from "react-aria-components";
-import { BiCheck } from "react-icons/bi";
 import { FaCopy, FaFileCode } from "react-icons/fa";
-import { VscChromeClose } from "react-icons/vsc";
+import { VscCheck, VscChromeClose } from "react-icons/vsc";
 import { TooltipButton } from "../ui/TooltipButton";
 
 function printPrettyHTML(str: string) {
@@ -93,13 +92,13 @@ export function ShowHtmlPlugin() {
                   <div className="flex gap-2">
                     {isCopied ? (
                       <div className="flex items-center bg-green-500 px-2 py-1">
-                        <BiCheck />
+                        <VscCheck />
                       </div>
                     ) : (
                       <TooltipButton
                         tooltipMessage="Copy to clipboard"
                         onPress={handleCopyClick}
-                        className="bg-green-500 text-white-600 hover:bg-green-300"
+                        className="bg-green-500 text-white-600 hover:bg-green-400"
                         disabled={isCopied}
                       >
                         <FaCopy />

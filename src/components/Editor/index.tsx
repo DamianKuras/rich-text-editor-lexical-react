@@ -19,6 +19,7 @@ import { useSettingsContext } from "./context/SettingsContext";
 import CodeHighlightPlugin from "./plugins/CodeHighlightPlugin";
 import FloatingLinkEditorPlugin from "./plugins/FloatingLinkEditorPlugin";
 import LinkPlugin from "./plugins/LinkPlugin";
+import { FindAndReplacePlugin } from "./plugins/FindAndReplacePlugin";
 import { ShowHtmlPlugin } from "./plugins/ShowHtmlPlugin";
 import LocalStorage from "./plugins/StoragePlugin/LocalStorage";
 import StoragePlugin from "./plugins/StoragePlugin/StoragePlugin";
@@ -38,6 +39,7 @@ export function Editor() {
     namespace: "rich-text-editor",
     theme: EditorTheme,
     onError(error: Error) {
+      // eslint-disable-next-line no-console
       console.log(error);
     },
     nodes: [
@@ -70,6 +72,7 @@ export function Editor() {
               </div>
               <StoragePlugin storage={storage} />
               <ToolbarPlugin />
+              <FindAndReplacePlugin />
               <ShowHtmlPlugin />
             </div>
           </IconContext.Provider>
@@ -77,7 +80,10 @@ export function Editor() {
         <div className="relative bg-gray-700">
           <RichTextPlugin
             contentEditable={
-              <div className="relative z-0 flex w-full resize-y overflow-auto">
+              <div
+                className="relative z-0 flex w-full resize-y overflow-auto"
+                id="editor"
+              >
                 <ContentEditable
                   className="w-full px-8 py-8 text-gray-100 focus:outline-none "
                   spellCheck={spellcheck}
