@@ -17,12 +17,13 @@ import { ToolbarPlugin } from "./Toolbar";
 import { SettingsPopover } from "./Toolbar/SettingsPopover";
 import { useSettingsContext } from "./context/SettingsContext";
 import CodeHighlightPlugin from "./plugins/CodeHighlightPlugin";
+import { FindAndReplacePlugin } from "./plugins/FindAndReplacePlugin";
 import FloatingLinkEditorPlugin from "./plugins/FloatingLinkEditorPlugin";
 import LinkPlugin from "./plugins/LinkPlugin";
-import { FindAndReplacePlugin } from "./plugins/FindAndReplacePlugin";
 import { ShowHtmlPlugin } from "./plugins/ShowHtmlPlugin";
 import LocalStorage from "./plugins/StoragePlugin/LocalStorage";
 import StoragePlugin from "./plugins/StoragePlugin/StoragePlugin";
+import { TextStatisticsPlugin } from "./plugins/TextStatisticsPlugin";
 
 export type BlockType =
   | "paragraph"
@@ -73,6 +74,7 @@ export function Editor() {
               <StoragePlugin storage={storage} />
               <ToolbarPlugin />
               <FindAndReplacePlugin />
+              <TextStatisticsPlugin />
               <ShowHtmlPlugin />
             </div>
           </IconContext.Provider>
