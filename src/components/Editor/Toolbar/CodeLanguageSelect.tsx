@@ -39,7 +39,7 @@ export function CodeLanguageSelect({
         handleCodeLanguageSelection(selected as string);
       }}
     >
-      {(item) => SelectItem(item)}
+      {(item) => <SelectItem>{item.name}</SelectItem>}
     </ToolbarSelect>
   );
 }

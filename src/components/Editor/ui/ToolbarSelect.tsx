@@ -1,4 +1,4 @@
-import type { SelectProps } from "react-aria-components";
+import type { ItemProps, SelectProps } from "react-aria-components";
 import {
   Button,
   Item,
@@ -56,11 +56,12 @@ export type SelectItemProps = {
   id: React.Key;
 };
 
-export function SelectItem(item: SelectItemProps) {
+export function SelectItem(props: ItemProps) {
   return (
     <Item
+      {...props}
       className={({ isFocused, isSelected }) =>
-        `relative px-6 py-1 text-sm text-white-600 outline-none md:py-2 ${
+        `relative py-1 pl-6 pr-2 text-sm text-white-600 outline-none md:py-2 ${
           isFocused
             ? "cursor-default border-none bg-blue-400 outline-none hover:bg-blue-400"
             : ""
@@ -70,8 +71,6 @@ export function SelectItem(item: SelectItemProps) {
             : "before:content-[' ']"
         }`
       }
-    >
-      {item.name}
-    </Item>
+    />
   );
 }

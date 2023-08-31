@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  safelist: ["min-w-[8em]", "min-w-[4em]"],
   theme: {
     fontFamily: {
       sans: ["ui-sans-serif", "system-ui"],
@@ -69,11 +70,6 @@ export default {
           800: "#304a96",
           900: "#1e3061",
         },
-        "floating-input-border": "#F5F5F5",
-        "floating-input-border-focused": "#5CB85C",
-        "floating-intput-label-text": "#F5F5F5",
-        "floating-input-label-background": "#424242",
-        "floating-input-label-focused": "#5CB85C",
         "code-background": "#212121",
         "code-highlight-atrule": "#FF6E87",
         "code-highlight-attr": "#96DB76",

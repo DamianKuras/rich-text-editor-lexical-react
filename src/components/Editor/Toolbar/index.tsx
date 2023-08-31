@@ -12,17 +12,15 @@ import {
 import {
   $getNodeByKey,
   $getSelection,
+  $isElementNode,
   $isRangeSelection,
   $isRootOrShadowRoot,
   CAN_REDO_COMMAND,
   CAN_UNDO_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
   ElementFormatType,
-  FORMAT_ELEMENT_COMMAND,
   FORMAT_TEXT_COMMAND,
-  INDENT_CONTENT_COMMAND,
   NodeKey,
-  OUTDENT_CONTENT_COMMAND,
   REDO_COMMAND,
   SELECTION_CHANGE_COMMAND,
   TextFormatType,
@@ -30,17 +28,11 @@ import {
 } from "lexical";
 import { useCallback, useEffect, useState } from "react";
 import {
-  FaAlignCenter,
-  FaAlignJustify,
-  FaAlignLeft,
-  FaAlignRight,
   FaBold,
-  FaIndent,
   FaItalic,
   FaLevelDownAlt,
   FaLevelUpAlt,
   FaLink,
-  FaOutdent,
   FaRedo,
   FaStrikethrough,
   FaSubscript,
@@ -58,6 +50,7 @@ import {
 } from "../utils/InsertParagraph";
 import { getSelectedNode } from "../utils/getSelectedNode";
 import { sanitizeUrl } from "../utils/url";
+import { AlignmentSelect } from "./AlignmentSelect";
 import { BlockFormatSelect } from "./BlockFormatSelect";
 import { CodeLanguageSelect } from "./CodeLanguageSelect";
 
@@ -81,6 +74,7 @@ export function ToolbarPlugin(): JSX.Element {
   const [isSubscript, setIsSubscript] = useState(false);
   const [isSuperscript, setIsSuperscript] = useState(false);
   const [codeLanguage, setCodeLanguage] = useState<string>("");
+  const [elementFormat, setElementFormat] = useState<ElementFormatType>("left");
   const [selectedBlockType, setSelectedBlockType] =
     useState<BlockType>("paragraph");
 
@@ -127,7 +121,6 @@ export function ToolbarPlugin(): JSX.Element {
           setCodeLanguage(
             language ? CODE_LANGUAGE_MAP[language] || language : ""
           );
-          return;
         }
       }
       setIsBold(selection.hasFormat("bold"));
@@ -144,6 +137,11 @@ export function ToolbarPlugin(): JSX.Element {
       } else {
         setIsLink(false);
       }
+      setElementFormat(
+        ($isElementNode(node)
+          ? node.getFormatType()
+          : parent?.getFormatType()) || "left"
+      );
     }
   }, [activeEditor]);
 
@@ -199,10 +197,6 @@ export function ToolbarPlugin(): JSX.Element {
     activeEditor.dispatchCommand(REDO_COMMAND, undefined);
   };
 
-  const handleFormatElement = (element: ElementFormatType) => {
-    activeEditor.dispatchCommand(FORMAT_ELEMENT_COMMAND, element);
-  };
-
   const handleCodeLangugeChange = useCallback(
     (value: string) => {
       editor.update(() => {
@@ -216,14 +210,6 @@ export function ToolbarPlugin(): JSX.Element {
     },
     [editor, selectedElementKey]
   );
-
-  const handleIndent = () => {
-    activeEditor.dispatchCommand(INDENT_CONTENT_COMMAND, undefined);
-  };
-
-  const handleOutdent = () => {
-    activeEditor.dispatchCommand(OUTDENT_CONTENT_COMMAND, undefined);
-  };
 
   const handleFormatText = (format: TextFormatType) => {
     activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, format);
@@ -245,183 +231,141 @@ export function ToolbarPlugin(): JSX.Element {
   }, [activeEditor, isLink]);
 
   return (
-      <div className="flex">
-        <div className="flex border-r px-2">
-          <TooltipButton
-            tooltipMessage="Undo (Ctrl+z)"
-            disabled={!canUndo}
-            onPress={handleUndo}
-          >
-            <FaUndo />
-          </TooltipButton>
+    <div className="flex">
+      <div className="flex border-r px-2">
+        <TooltipButton
+          tooltipMessage="Undo (Ctrl+z)"
+          disabled={!canUndo}
+          onPress={handleUndo}
+        >
+          <FaUndo />
+        </TooltipButton>
 
-          <TooltipButton
-            tooltipMessage="Redo (Ctrl+y)"
-            disabled={!canRedo}
-            onPress={handleRedo}
-          >
-            <FaRedo />
-          </TooltipButton>
-        </div>
-        {activeEditor === editor && (
-          <div className="flex min-w-[8em] justify-center border-r px-1">
-            <div className="my-auto">
-              <BlockFormatSelect
-                activeEditor={activeEditor}
-                selectedBlockType={selectedBlockType}
-                setSelectedBlockType={setSelectedBlockType}
-              />
-            </div>
-          </div>
-        )}
-
-        {selectedBlockType === "code" && (
-          <div className="flex min-w-[8em] justify-center border-r px-1">
-            <div className="my-auto">
-              <CodeLanguageSelect
-                onCodeLanguageChange={handleCodeLangugeChange}
-                selectedCodeLanguage={codeLanguage}
-              />
-            </div>
-          </div>
-        )}
-
-        <div className="flex border-r px-2">
-          <TooltipButton
-            tooltipMessage="Align left"
-            onPress={() => handleFormatElement("left")}
-          >
-            <FaAlignLeft />
-          </TooltipButton>
-
-          <TooltipButton
-            tooltipMessage="Align center"
-            onPress={() => handleFormatElement("center")}
-          >
-            <FaAlignCenter />
-          </TooltipButton>
-
-          <TooltipButton
-            tooltipMessage="Align right"
-            onPress={() => handleFormatElement("right")}
-          >
-            <FaAlignRight />
-          </TooltipButton>
-
-          <TooltipButton
-            tooltipMessage="Align justify"
-            onPress={() => handleFormatElement("justify")}
-          >
-            <FaAlignJustify />
-          </TooltipButton>
-
-          <TooltipButton
-            tooltipMessage="Indent"
-            onPress={() => handleIndent()}
-          >
-            <FaIndent />
-          </TooltipButton>
-
-          <TooltipButton
-            tooltipMessage="Outdent"
-            onPress={() => handleOutdent()}
-          >
-            <FaOutdent />
-          </TooltipButton>
-        </div>
-        {(selectedBlockType === "paragraph" ||
-          selectedBlockType === "h1" ||
-          selectedBlockType === "h2" ||
-          selectedBlockType === "h3" ||
-          selectedBlockType === "bullet" ||
-          selectedBlockType === "number" ||
-          selectedBlockType === "quote") && (
-          <>
-            <div className="flex border-r px-2">
-              <TooltipToggleButton
-                tooltipMessage="Bold"
-                selected={isBold}
-                onPress={() => {
-                  handleFormatText("bold");
-                }}
-              >
-                <FaBold />
-              </TooltipToggleButton>
-
-              <TooltipToggleButton
-                tooltipMessage="Italic"
-                selected={isItalic}
-                onPress={() => handleFormatText("italic")}
-              >
-                <FaItalic />
-              </TooltipToggleButton>
-
-              <TooltipToggleButton
-                tooltipMessage="Underline"
-                selected={isUnderline}
-                onPress={() => handleFormatText("underline")}
-              >
-                <FaUnderline />
-              </TooltipToggleButton>
-
-              <TooltipToggleButton
-                tooltipMessage="Link"
-                selected={isLink}
-                onPress={() => handleToggleLink()}
-              >
-                <FaLink />
-              </TooltipToggleButton>
-
-              <TooltipToggleButton
-                tooltipMessage="striketrough"
-                selected={isStrikethrough}
-                onPress={() => handleFormatText("strikethrough")}
-              >
-                <FaStrikethrough />
-              </TooltipToggleButton>
-
-              <TooltipToggleButton
-                tooltipMessage="Subscript"
-                selected={isSubscript}
-                onPress={() => handleFormatText("subscript")}
-              >
-                <FaSubscript />
-              </TooltipToggleButton>
-
-              <TooltipToggleButton
-                tooltipMessage="Superscript"
-                selected={isSuperscript}
-                onPress={() => handleFormatText("superscript")}
-              >
-                <FaSuperscript />
-              </TooltipToggleButton>
-            </div>
-            <div className="flex pl-2">
-              <TooltipButton
-                tooltipMessage="Insert horizontal rule"
-                onPress={() => handleInsertHorizontalRule()}
-              >
-                <MdInsertPageBreak />
-              </TooltipButton>
-              <TooltipButton
-                tooltipMessage="Insert paragraph before"
-                onPress={() => {
-                  InsertParagraphBeforeElement(editor);
-                }}
-              >
-                <FaLevelUpAlt />
-              </TooltipButton>
-              <TooltipButton
-                tooltipMessage="Insert paragraph after"
-                onPress={() => {
-                  InsertParagraphAfterElement(editor);
-                }}
-              >
-                <FaLevelDownAlt />
-              </TooltipButton>
-            </div>
-          </>
-        )}
+        <TooltipButton
+          tooltipMessage="Redo (Ctrl+y)"
+          disabled={!canRedo}
+          onPress={handleRedo}
+        >
+          <FaRedo />
+        </TooltipButton>
       </div>
+      <div className="flex min-w-[8em] justify-center border-r px-1">
+        <div className="my-auto">
+          <BlockFormatSelect
+            activeEditor={activeEditor}
+            selectedBlockType={selectedBlockType}
+            setSelectedBlockType={setSelectedBlockType}
+          />
+        </div>
+      </div>
+      <AlignmentSelect
+        value={elementFormat}
+        activeEditor={activeEditor}
+      />
+      {selectedBlockType === "code" && (
+        <div className="flex min-w-[8em] justify-center border-r px-1">
+          <div className="my-auto">
+            <CodeLanguageSelect
+              onCodeLanguageChange={handleCodeLangugeChange}
+              selectedCodeLanguage={codeLanguage}
+            />
+          </div>
+        </div>
+      )}
+
+      {(selectedBlockType === "paragraph" ||
+        selectedBlockType === "h1" ||
+        selectedBlockType === "h2" ||
+        selectedBlockType === "h3" ||
+        selectedBlockType === "bullet" ||
+        selectedBlockType === "number" ||
+        selectedBlockType === "quote") && (
+        <>
+          <div className="flex border-r px-2">
+            <TooltipToggleButton
+              tooltipMessage="Bold"
+              selected={isBold}
+              onPress={() => {
+                handleFormatText("bold");
+              }}
+            >
+              <FaBold />
+            </TooltipToggleButton>
+
+            <TooltipToggleButton
+              tooltipMessage="Italic"
+              selected={isItalic}
+              onPress={() => handleFormatText("italic")}
+            >
+              <FaItalic />
+            </TooltipToggleButton>
+
+            <TooltipToggleButton
+              tooltipMessage="Underline"
+              selected={isUnderline}
+              onPress={() => handleFormatText("underline")}
+            >
+              <FaUnderline />
+            </TooltipToggleButton>
+
+            <TooltipToggleButton
+              tooltipMessage="Link"
+              selected={isLink}
+              onPress={() => handleToggleLink()}
+            >
+              <FaLink />
+            </TooltipToggleButton>
+
+            <TooltipToggleButton
+              tooltipMessage="striketrough"
+              selected={isStrikethrough}
+              onPress={() => handleFormatText("strikethrough")}
+            >
+              <FaStrikethrough />
+            </TooltipToggleButton>
+
+            <TooltipToggleButton
+              tooltipMessage="Subscript"
+              selected={isSubscript}
+              onPress={() => handleFormatText("subscript")}
+            >
+              <FaSubscript />
+            </TooltipToggleButton>
+
+            <TooltipToggleButton
+              tooltipMessage="Superscript"
+              selected={isSuperscript}
+              onPress={() => handleFormatText("superscript")}
+            >
+              <FaSuperscript />
+            </TooltipToggleButton>
+            <TooltipButton
+              tooltipMessage="Insert horizontal rule"
+              onPress={() => handleInsertHorizontalRule()}
+            >
+              <MdInsertPageBreak />
+            </TooltipButton>
+          </div>
+        </>
+      )}
+      <div className="flex pl-2">
+        <TooltipButton
+          tooltipMessage="Insert paragraph before"
+          onPress={() => {
+            InsertParagraphBeforeElement(editor);
+          }}
+        >
+          <FaLevelUpAlt />
+        </TooltipButton>
+        <TooltipButton
+          tooltipMessage="Insert paragraph after"
+          onPress={() => {
+            InsertParagraphAfterElement(editor);
+          }}
+        >
+          <FaLevelDownAlt />
+        </TooltipButton>
+      </div>
+    </div>
   );
 }

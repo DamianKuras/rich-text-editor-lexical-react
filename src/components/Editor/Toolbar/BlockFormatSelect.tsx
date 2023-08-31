@@ -134,7 +134,6 @@ for (let i = 0, len = options.length; i < len; i++) {
 export function BlockFormatSelect({
   activeEditor,
   selectedBlockType,
-  setSelectedBlockType,
 }: BlockFormatSelectProps): JSX.Element {
   return (
     <ToolbarSelect
@@ -147,11 +146,10 @@ export function BlockFormatSelect({
         const selectedOption = lookup[selected];
         if (selectedOption?.formatHandler) {
           selectedOption.formatHandler(activeEditor);
-          setSelectedBlockType(selected as BlockType);
         }
       }}
     >
-      {(item) => SelectItem(item)}
+      {(item) => <SelectItem>{item.name}</SelectItem>}
     </ToolbarSelect>
   );
 }
