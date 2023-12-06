@@ -4,7 +4,7 @@ interface MySwitchProps extends Omit<SwitchProps, "children"> {
   children: React.ReactNode;
 }
 
-export function ToolbarSwitch({ children, ...props }: MySwitchProps) {
+export function ToolbarSwitch({ children, ...props }: Readonly<MySwitchProps>) {
   return (
     <Switch
       {...props}

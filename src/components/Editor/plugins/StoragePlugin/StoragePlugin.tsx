@@ -26,7 +26,7 @@ type StorageSaveStatus = {
 export default function StoragePlugin({
   storage,
   fallbackStorage,
-}: SavePluginProps) {
+}: Readonly<SavePluginProps>) {
   const [editor] = useLexicalComposerContext();
   const { autoSaveEnabled, autoSaveInterval } = useSettingsContext();
   const [activeEditor, setActiveEditor] = useState(editor);
@@ -157,7 +157,7 @@ export default function StoragePlugin({
         onPress={() => handleSave()}
         tooltipMessage="Save to local storage"
       >
-        <FaSave />
+        <FaSave size="18" />
       </TooltipButton>
       <div
         className={`${getStatusBackgroundColorClass()} my-auto h-2 w-2 rounded-full`}

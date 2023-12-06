@@ -34,7 +34,7 @@ export function SettingsPopover() {
     <div className="b-2 border-toolbar-disabled flex">
       <DialogTrigger>
         <TooltipButton tooltipMessage="Settings">
-          <IoSettingsSharp />
+          <IoSettingsSharp size="18" />
         </TooltipButton>
         <Popover
           crossOffset={130}

@@ -42,17 +42,17 @@ function FloatingLinkEditor({
   isLink,
   setIsLink,
   anchorElem,
-}: {
+}: Readonly<{
   editor: LexicalEditor;
   isLink: boolean;
   setIsLink: Dispatch<boolean>;
   anchorElem: HTMLElement;
-}): JSX.Element {
+}>): JSX.Element {
   const editorRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [linkUrl, setLinkUrl] = useState("");
   const [editedLinkUrl, setEditedLinkUrl] = useState("");
-  const [isEditMode, setEditMode] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
   const [lastSelection, setLastSelection] = useState<
     RangeSelection | GridSelection | NodeSelection | null
   >(null);
@@ -99,7 +99,7 @@ function FloatingLinkEditor({
         setFloatingElemPositionForLinkEditor(null, editorElem, anchorElem);
       }
       setLastSelection(null);
-      setEditMode(false);
+      setIsEditMode(false);
       setLinkUrl("");
     }
 
@@ -180,7 +180,7 @@ function FloatingLinkEditor({
       handleLinkSubmission();
     } else if (event.key === "Escape") {
       event.preventDefault();
-      setEditMode(false);
+      setIsEditMode(false);
     }
   };
 
@@ -189,7 +189,7 @@ function FloatingLinkEditor({
       if (linkUrl !== "") {
         editor.dispatchCommand(TOGGLE_LINK_COMMAND, sanitizeUrl(editedLinkUrl));
       }
-      setEditMode(false);
+      setIsEditMode(false);
     }
   };
 
@@ -227,7 +227,7 @@ function FloatingLinkEditor({
               <TooltipButton
                 tooltipMessage="Cancel link"
                 className="bg-red-500 hover:bg-red-300"
-                onPress={() => setEditMode(false)}
+                onPress={() => setIsEditMode(false)}
               >
                 <VscChromeClose />
               </TooltipButton>
@@ -249,7 +249,7 @@ function FloatingLinkEditor({
                 className="mr-2 bg-green-500 hover:bg-green-300"
                 onPress={() => {
                   setEditedLinkUrl(linkUrl);
-                  setEditMode(true);
+                  setIsEditMode(true);
                 }}
               >
                 <FaEdit />

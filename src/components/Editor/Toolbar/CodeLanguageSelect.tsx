@@ -20,7 +20,7 @@ const selectItems: Option[] = Object.entries(
 export function CodeLanguageSelect({
   onCodeLanguageChange,
   selectedCodeLanguage,
-}: CodeLanguageSelectProps): JSX.Element {
+}: Readonly<CodeLanguageSelectProps>): JSX.Element {
   const handleCodeLanguageSelection = (language: string) => {
     if (selectedCodeLanguage === language) {
       return;
@@ -34,7 +34,6 @@ export function CodeLanguageSelect({
       selectedKey={selectedCodeLanguage}
       defaultSelectedKey={"js"}
       key={"code-language-select"}
-      minWidth="[8em]"
       onSelectionChange={(selected) => {
         handleCodeLanguageSelection(selected as string);
       }}

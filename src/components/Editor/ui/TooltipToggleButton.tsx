@@ -22,13 +22,13 @@ export function TooltipToggleButton({
   children,
   disabled,
   selected,
-}: Props): JSX.Element {
+}: Readonly<Props>): JSX.Element {
   return (
     <TooltipTrigger>
       <ToggleButton
         isDisabled={disabled}
         isSelected={selected}
-        className={`${className ? className + " " : ""}px-2 pb-2 pt-1 ${
+        className={`${className ? className + " " : ""}px-2 py-1 ${
           disabled ? "[&>svg]:text-gray-300" : "hover:bg-gray-700"
         } ${selected ? "bg-gray-700" : ""}`}
         onPress={onPress}

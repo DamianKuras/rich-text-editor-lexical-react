@@ -175,7 +175,7 @@ export function FindAndReplacePlugin() {
   return (
     <DialogTrigger>
       <TooltipButton tooltipMessage="Find and replace">
-        <MdOutlineFindReplace />
+        <MdOutlineFindReplace size="20" />
       </TooltipButton>
       <ModalOverlay
         isDismissable={true}

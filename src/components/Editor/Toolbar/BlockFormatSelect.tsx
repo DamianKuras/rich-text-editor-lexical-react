@@ -134,13 +134,12 @@ for (let i = 0, len = options.length; i < len; i++) {
 export function BlockFormatSelect({
   activeEditor,
   selectedBlockType,
-}: BlockFormatSelectProps): JSX.Element {
+}: Readonly<BlockFormatSelectProps>): JSX.Element {
   return (
     <ToolbarSelect
       aria-label="block format select"
       items={options}
       selectedKey={selectedBlockType}
-      minWidth="[8em]"
       key={"block-format-select"}
       onSelectionChange={(selected) => {
         const selectedOption = lookup[selected];

@@ -23,7 +23,7 @@ type AlignmentSelectProps = {
 export function AlignmentSelect({
   value,
   activeEditor,
-}: AlignmentSelectProps): JSX.Element {
+}: Readonly<AlignmentSelectProps>): JSX.Element {
   type Option = {
     id: string;
     formatHandler?: (editor: LexicalEditor) => void;
@@ -74,41 +74,38 @@ export function AlignmentSelect({
   }
 
   return (
-    <div className="flex border-r px-2">
-      <ToolbarSelect
-        aria-label="Alignment Select"
-        items={options}
-        selectedKey={value}
-        defaultSelectedKey={"left"}
-        key={"alignment-select"}
-        minWidth="[4em]"
-        onSelectionChange={(selected) => {
-          const selectedOption = lookup[selected];
-          if (selectedOption?.formatHandler) {
-            selectedOption.formatHandler(activeEditor);
-          }
-        }}
-      >
-        <SelectItem id="left">
-          <FaAlignLeft />
-        </SelectItem>
-        <SelectItem id="center">
-          <FaAlignCenter />
-        </SelectItem>
-        <SelectItem id="right">
-          <FaAlignRight />
-        </SelectItem>
-        <SelectItem id="justify">
-          <FaAlignJustify />
-        </SelectItem>
+    <ToolbarSelect
+      aria-label="Alignment Select"
+      items={options}
+      selectedKey={value}
+      defaultSelectedKey={"left"}
+      key={"alignment-select"}
+      onSelectionChange={(selected) => {
+        const selectedOption = lookup[selected];
+        if (selectedOption?.formatHandler) {
+          selectedOption.formatHandler(activeEditor);
+        }
+      }}
+    >
+      <SelectItem id="left">
+        <FaAlignLeft size="18" />
+      </SelectItem>
+      <SelectItem id="center">
+        <FaAlignCenter size="18" />
+      </SelectItem>
+      <SelectItem id="right">
+        <FaAlignRight size="18" />
+      </SelectItem>
+      <SelectItem id="justify">
+        <FaAlignJustify size="18" />
+      </SelectItem>
 
-        <SelectItem id="indent">
-          <FaIndent />
-        </SelectItem>
-        <SelectItem id="outdent">
-          <FaOutdent />
-        </SelectItem>
-      </ToolbarSelect>
-    </div>
+      <SelectItem id="indent">
+        <FaIndent size="18" />
+      </SelectItem>
+      <SelectItem id="outdent">
+        <FaOutdent size="18" />
+      </SelectItem>
+    </ToolbarSelect>
   );
 }

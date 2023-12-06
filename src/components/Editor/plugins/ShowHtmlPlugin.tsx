@@ -24,11 +24,11 @@ function prettifyHTML(node: Element, level: number) {
   const indentAfter = new Array(level).join("  ");
   let textNode;
 
-  for (let i = 0; i < node.children.length; i++) {
+  for (const element of node.children) {
     textNode = document.createTextNode("\n" + indentBefore);
-    node.insertBefore(textNode, node.children[i]);
-    prettifyHTML(node.children[i], level + 1);
-    if (node.lastElementChild === node.children[i]) {
+    node.insertBefore(textNode, element);
+    prettifyHTML(element, level + 1);
+    if (node.lastElementChild === element) {
       textNode = document.createTextNode("\n" + indentAfter);
       node.appendChild(textNode);
     }
@@ -41,7 +41,7 @@ export function ShowHtmlPlugin() {
   const [editor] = useLexicalComposerContext();
   const [htmlContent, setHtmlContent] = useState("");
   const [isCopied, setIsCopied] = useState(false);
-  const [isOpen, setOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const updateHTML = useCallback(
     (editorState: EditorState) => {
       editorState.read(() => {
@@ -63,7 +63,7 @@ export function ShowHtmlPlugin() {
 
   function handleOpen() {
     updateHTML(editor.getEditorState());
-    setOpen(true);
+    setIsOpen(true);
   }
 
   return (
@@ -81,7 +81,7 @@ export function ShowHtmlPlugin() {
       >
         <Modal
           isOpen={isOpen}
-          onOpenChange={setOpen}
+          onOpenChange={setIsOpen}
           className="react-aria-Modal "
         >
           <Dialog className="z-50 mx-auto my-auto max-h-[80vh] min-w-[30em] max-w-[80vw] overflow-auto bg-gray-800 outline-none">

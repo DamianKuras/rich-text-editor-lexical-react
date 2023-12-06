@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ReactNode, createContext, useContext, useState } from "react";
+import { ReactNode, createContext, useContext, useMemo, useState } from "react";
 
 interface SettingsContextProps {
   autoSaveEnabled: boolean;
@@ -22,24 +22,26 @@ export const SettingsContext: React.Context<SettingsContextProps> =
 
 export function SettingContextProvider({
   children,
-}: {
+}: Readonly<{
   children: ReactNode;
-}): JSX.Element {
+}>): JSX.Element {
   const [autoSaveEnabled, setAutoSaveEnabled] = useState(true);
   const [autoSaveInterval, setAutoSaveInterval] = useState(3);
   const [spellcheck, setSpellcheck] = useState(true);
 
+  const contextValue = useMemo(() => {
+    return {
+      autoSaveEnabled,
+      autoSaveInterval,
+      spellcheck,
+      setAutoSaveEnabled,
+      setAutoSaveInterval,
+      setSpellcheck,
+    };
+  }, [autoSaveEnabled, autoSaveInterval, spellcheck]);
+
   return (
-    <SettingsContext.Provider
-      value={{
-        autoSaveEnabled: autoSaveEnabled,
-        autoSaveInterval: autoSaveInterval,
-        spellcheck: spellcheck,
-        setAutoSaveEnabled,
-        setAutoSaveInterval,
-        setSpellcheck,
-      }}
-    >
+    <SettingsContext.Provider value={contextValue}>
       {children}
     </SettingsContext.Provider>
   );

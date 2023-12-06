@@ -64,7 +64,7 @@ export function Editor() {
         <div className="sticky top-0 z-10 flex justify-between bg-gray-500 p-1">
           <IconContext.Provider
             value={{
-              className: "text-white-600 w-4 h-4 inline-block",
+              className: "text-white-600 inline-block",
             }}
           >
             <div className="flex max-w-full overflow-auto">
