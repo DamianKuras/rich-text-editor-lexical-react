@@ -68,7 +68,7 @@ export function AlignmentSelect({
   ];
 
   // Create a lookup object to map ids to options
-  const lookup: { [id: React.Key]: Option } = {};
+  const lookup: { [id: string]: Option } = {};
   for (let i = 0, len = options.length; i < len; i++) {
     lookup[options[i].id] = options[i];
   }
@@ -87,23 +87,23 @@ export function AlignmentSelect({
         }
       }}
     >
-      <SelectItem id="left">
+      <SelectItem id="left" textValue="align left">
         <FaAlignLeft size="18" />
       </SelectItem>
-      <SelectItem id="center">
+      <SelectItem id="center" textValue="align center">
         <FaAlignCenter size="18" />
       </SelectItem>
-      <SelectItem id="right">
+      <SelectItem id="right" textValue="align right">
         <FaAlignRight size="18" />
       </SelectItem>
-      <SelectItem id="justify">
+      <SelectItem id="justify" textValue="justify">
         <FaAlignJustify size="18" />
       </SelectItem>
 
-      <SelectItem id="indent">
+      <SelectItem id="indent" textValue="indent">
         <FaIndent size="18" />
       </SelectItem>
-      <SelectItem id="outdent">
+      <SelectItem id="outdent" textValue="outdent">
         <FaOutdent size="18" />
       </SelectItem>
     </ToolbarSelect>

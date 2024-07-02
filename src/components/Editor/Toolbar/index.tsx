@@ -108,7 +108,7 @@ export function ToolbarPlugin(): JSX.Element {
             ? element.getTag()
             : element.getType();
           if (type) {
-            setSelectedBlockType(type);
+            setSelectedBlockType(type as BlockType);
           }
         }
         if ($isCodeNode(element)) {
@@ -193,7 +193,7 @@ export function ToolbarPlugin(): JSX.Element {
     activeEditor.dispatchCommand(REDO_COMMAND, undefined);
   };
 
-  const handleCodeLangugeChange = useCallback(
+  const handleCodeLanguageChange = useCallback(
     (value: string) => {
       editor.update(() => {
         if (selectedElementKey !== null) {
@@ -262,7 +262,7 @@ export function ToolbarPlugin(): JSX.Element {
       {selectedBlockType === "code" && (
         <div className="border-r">
           <CodeLanguageSelect
-            onCodeLanguageChange={handleCodeLangugeChange}
+            onCodeLanguageChange={handleCodeLanguageChange}
             selectedCodeLanguage={codeLanguage}
           />
         </div>
@@ -311,7 +311,7 @@ export function ToolbarPlugin(): JSX.Element {
           </TooltipToggleButton>
 
           <TooltipToggleButton
-            tooltipMessage="striketrough"
+            tooltipMessage="strikethrough"
             selected={isStrikethrough}
             onPress={() => handleFormatText("strikethrough")}
           >

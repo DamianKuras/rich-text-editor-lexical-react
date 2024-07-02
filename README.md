@@ -4,14 +4,14 @@ This project is a React-based rich text editor built using the Lexical framework
 
 ## Features
 - Heading, paragraph, quote, bulleted and numbered lists formatting
-- Bold, italic, underline, subscript and superscirpt text formatting
+- Bold, italic, underline, subscript and superscript text formatting
 - Adding horizontal rule
 - Text alignment options: left, center, right, justified, indent and outdent 
 - Undo and redo functionality
 - Save to local storage
 
 ## Installation
-Instruction of how to install project localy
+Instruction of how to install project locally
 1. Git clone https://github.com/DamianKuras/rich-text-editor-lexical-react
 2. npm install    
 3. npm run dev

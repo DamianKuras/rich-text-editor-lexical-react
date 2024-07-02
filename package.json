@@ -10,10 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@lexical/react": "^0.10.0",
-    "lexical": "^0.10.0",
+    "@lexical/react": "^0.16.0",
+    "lexical": "^0.16.0",
     "react": "^18.2.0",
-    "react-aria-components": "^1.0.0-alpha.6",
+    "react-aria-components": "^1.2.1",
     "react-dom": "^18.2.0",
     "react-icons": "^4.8.0"
   },

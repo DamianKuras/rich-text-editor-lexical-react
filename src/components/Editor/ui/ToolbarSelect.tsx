@@ -1,7 +1,7 @@
-import type { ItemProps, SelectProps } from "react-aria-components";
+import type { ListBoxItemProps, SelectProps } from "react-aria-components";
 import {
   Button,
-  Item,
+  ListBoxItem,
   ListBox,
   Popover,
   Select,
@@ -14,6 +14,7 @@ interface MySelectProps<T extends object>
   extends Omit<SelectProps<T>, "children"> {
   description?: string;
   errorMessage?: string;
+  items?: Iterable<T>;
   children: React.ReactNode | ((item: T) => React.ReactNode);
 }
 
@@ -21,6 +22,7 @@ export function ToolbarSelect<T extends object>({
   description,
   errorMessage,
   children,
+  items,
   ...props
 }: Readonly<MySelectProps<T>>) {
   return (
@@ -36,7 +38,7 @@ export function ToolbarSelect<T extends object>({
       {description && <Text slot="description">{description}</Text>}
       {errorMessage && <Text slot="errorMessage">{errorMessage}</Text>}
       <Popover className="react-aria-Popover bg-gray-900 ">
-        <ListBox className={`mx-auto overflow-auto outline-none outline-none`}>
+        <ListBox className={`mx-auto overflow-auto outline-none`} items={items}>
           {children}
         </ListBox>
       </Popover>
@@ -44,14 +46,9 @@ export function ToolbarSelect<T extends object>({
   );
 }
 
-export type SelectItemProps = {
-  name: string;
-  id: React.Key;
-};
-
-export function SelectItem(props: Readonly<ItemProps>) {
+export function SelectItem(props: Readonly<ListBoxItemProps>) {
   return (
-    <Item
+    <ListBoxItem
       {...props}
       className={({ isFocused, isSelected }) =>
         `relative  px-6 py-2 text-white-600 outline-none ${

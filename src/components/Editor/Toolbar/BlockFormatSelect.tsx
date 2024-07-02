@@ -126,7 +126,7 @@ const options: Option[] = [
 ];
 
 // Create a lookup object to map ids to options
-const lookup: { [id: React.Key]: Option } = {};
+const lookup: { [id: string]: Option } = {};
 for (let i = 0, len = options.length; i < len; i++) {
   lookup[options[i].id] = options[i];
 }
