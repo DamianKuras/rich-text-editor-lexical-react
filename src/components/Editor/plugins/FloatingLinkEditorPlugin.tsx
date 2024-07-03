@@ -35,6 +35,9 @@ import { getSelectedNode } from "../utils/getSelectedNode";
 import { setFloatingElemPositionForLinkEditor } from "../utils/setFloatingElemPositionForLinkEditor";
 import { sanitizeUrl } from "../utils/url";
 
+const IconContextValue = {
+  className: "text-white-600 w-4 h-4 inline-block",
+};
 function FloatingLinkEditor({
   editor,
   isLink,
@@ -51,9 +54,9 @@ function FloatingLinkEditor({
   const [linkUrl, setLinkUrl] = useState("");
   const [editedLinkUrl, setEditedLinkUrl] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
-  const [lastSelection, setLastSelection] = useState<
-    BaseSelection | null
-  >(null);
+  const [lastSelection, setLastSelection] = useState<BaseSelection | null>(
+    null
+  );
 
   const updateLinkEditor = useCallback(() => {
     const selection = $getSelection();
@@ -192,17 +195,13 @@ function FloatingLinkEditor({
   };
 
   return (
-    <IconContext.Provider
-      value={{
-        className: "text-white-600 w-4 h-4 inline-block",
-      }}
-    >
+    <IconContext.Provider value={IconContextValue}>
       <div
         ref={editorRef}
         className="absolute left-0 top-0 z-10 flex w-full max-w-[400px] translate-y-0 transform overflow-auto bg-gray-500 opacity-0 shadow-md transition-opacity duration-500"
       >
         {!isLink ? null : isEditMode ? (
-          <div className="block flex w-full justify-between p-2">
+          <div className="flex w-full justify-between p-2">
             <TextField className="flex w-full text-white-600 ">
               <Input
                 className="mr-2 w-full bg-gray-800 p-2 text-white-600 outline-none"
@@ -232,7 +231,7 @@ function FloatingLinkEditor({
             </div>
           </div>
         ) : (
-          <div className="relative block flex w-full justify-between p-2">
+          <div className="relative flex w-full justify-between p-2">
             <a
               href={sanitizeUrl(linkUrl)}
               target="_blank"

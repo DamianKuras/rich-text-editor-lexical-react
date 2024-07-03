@@ -45,10 +45,9 @@ export function TextStatisticsPlugin(): JSX.Element {
   const [sentenceCount, setSentenceCount] = useState(0);
   const [readingTime, setReadingTime] = useState({ minutes: 0, seconds: 0 });
 
-  const [isOpen, setOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   function handleOpen() {
-    // updateHTML(editor.getEditorState());
     editor.getEditorState().read(() => {
       const root = $getRoot();
       const text = root.getTextContent();
@@ -59,15 +58,12 @@ export function TextStatisticsPlugin(): JSX.Element {
       setSentenceCount(countSentences(text));
       setReadingTime(calculateReadingTime(wordCounted));
     });
-    setOpen(true);
+    setIsOpen(true);
   }
 
   return (
     <DialogTrigger>
-      <TooltipButton
-        tooltipMessage="Show statistics"
-        onPress={handleOpen}
-      >
+      <TooltipButton tooltipMessage="Show statistics" onPress={handleOpen}>
         <BsFillFileTextFill />
       </TooltipButton>
       <ModalOverlay
@@ -76,7 +72,7 @@ export function TextStatisticsPlugin(): JSX.Element {
       >
         <Modal
           isOpen={isOpen}
-          onOpenChange={setOpen}
+          onOpenChange={setIsOpen}
           className="react-aria-Modal "
         >
           <Dialog className="z-50 mx-auto my-auto max-h-[80vh] min-w-[20em] max-w-[80vw] overflow-auto bg-gray-800 outline-none">

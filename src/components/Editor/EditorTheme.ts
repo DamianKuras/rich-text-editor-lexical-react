@@ -11,9 +11,9 @@ export const EditorTheme = {
   },
   quote: "border-l-4 my-4 text-lg ml-4 pl-4 italic font-semibold",
   heading: {
-    h1: "text-3xl mb-4",
-    h2: "text-xl mb-4",
-    h3: "text-lg mb-4",
+    h1: "text-4xl mb-4",
+    h2: "text-3xl mb-4",
+    h3: "text-2xl mb-4",
   },
   list: {
     listitem: "mb-2",
@@ -27,7 +27,13 @@ export const EditorTheme = {
       "pl-12 list-inside list-[upper-roman]",
       "pl-16 list-inside list-[lower-roman]",
     ],
-    ul: "list-inside list-disc ml-4",
+    ulDepth: [
+      "list-inside list-disc",
+      "pl-4 list-inside list-[circle]",
+      "pl-8 list-inside list-[square]",
+      "pl-12 list-inside list-disc",
+      "pl-16 list-inside list-[circle]",
+    ],
   },
   code: "block leading-6 bg-gray-800 py-2 font-mono block pl-10 relative whitespace-pre-wrap before:py-2 before:text-disabled before:content-[attr(data-gutter)] before:absolute before:top-0 before:left-0 before:border-disabled before:border-r before:pr-2 before:pl-4 mb-2",
   codeHighlight: {

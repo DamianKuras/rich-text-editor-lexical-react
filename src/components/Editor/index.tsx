@@ -3,7 +3,7 @@ import { LinkNode } from "@lexical/link";
 import { ListItemNode, ListNode } from "@lexical/list";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
-import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
+import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { HorizontalRuleNode } from "@lexical/react/LexicalHorizontalRuleNode";
 import { HorizontalRulePlugin } from "@lexical/react/LexicalHorizontalRulePlugin";
@@ -35,6 +35,9 @@ export type BlockType =
   | "quote"
   | "code";
 
+const iconContextValue = {
+  className: "text-white-600 inline-block",
+};
 export function Editor() {
   const initialConfig = {
     namespace: "rich-text-editor",
@@ -62,11 +65,7 @@ export function Editor() {
     <div className="mx-auto w-full max-w-5xl">
       <LexicalComposer initialConfig={initialConfig}>
         <div className="sticky top-0 z-10 flex justify-between bg-gray-500 p-1">
-          <IconContext.Provider
-            value={{
-              className: "text-white-600 inline-block",
-            }}
-          >
+          <IconContext.Provider value={iconContextValue}>
             <div className="flex max-w-full overflow-auto">
               <div className="flex border-r px-2">
                 <SettingsPopover />

@@ -1,5 +1,6 @@
 import { IconContext } from "react-icons";
 import { ImGithub } from "react-icons/im";
+const IconContextValue = { className: "w-6 h-6 inline-block" };
 export function Header() {
   return (
     <header className="p-10 text-white-800">
@@ -15,7 +16,7 @@ export function Header() {
           className="inline-flex items-center"
         >
           <span className="mr-2">Check out project on Github</span>
-          <IconContext.Provider value={{ className: "w-6 h-6 inline-block" }}>
+          <IconContext.Provider value={IconContextValue}>
             <ImGithub />
           </IconContext.Provider>
         </a>

@@ -3,6 +3,7 @@ import { $dfs } from "@lexical/utils";
 import { $getRoot, $isTextNode, TextNode } from "lexical";
 import { useState } from "react";
 import {
+  Button,
   Dialog,
   DialogTrigger,
   Heading,
@@ -30,6 +31,7 @@ export function FindAndReplacePlugin() {
   const [matches, setMatches] = useState<{ node: TextNode; index: number }[]>(
     []
   );
+  const disabled = matches.length <= 2;
 
   function scrollIntoSelection() {
     const selection = window.getSelection();
@@ -62,9 +64,8 @@ export function FindAndReplacePlugin() {
 
   function nextMatch() {
     editor.update(() => {
-      const nextMatchPos =
-        matchesPos + 1 <= matches.length ? matchesPos + 1 : 1;
-      const match = matches[nextMatchPos - 1];
+      const nextMatchPos = matchesPos + 1 < matches.length ? matchesPos + 1 : 0;
+      const match = matches[nextMatchPos];
       match.node.select(match.index, match.index + searchStr.length);
       setMatchesPos(nextMatchPos);
     });
@@ -75,8 +76,8 @@ export function FindAndReplacePlugin() {
   function prevMatch() {
     editor.update(() => {
       const nextMatchPos =
-        matchesPos - 1 >= 1 ? matchesPos - 1 : matches.length;
-      const match = matches[nextMatchPos - 1];
+        matchesPos - 1 >= 0 ? matchesPos - 1 : matches.length - 1;
+      const match = matches[nextMatchPos];
       match.node.select(match.index, match.index + searchStr.length);
       setMatchesPos(nextMatchPos);
     });
@@ -97,7 +98,7 @@ export function FindAndReplacePlugin() {
       const newMatches = matches
         .filter((item) => item != match)
         .map((item) => {
-          //update indexes in the same node past match occurence
+          //update indexes in the same node past match occurrence
           if (
             item.node.getKey() == match.node.getKey() &&
             item.index > match.index
@@ -106,11 +107,12 @@ export function FindAndReplacePlugin() {
           return item;
         });
       setMatches(newMatches);
-      const nextmatch = newMatches[matchesPos - 1];
+      const nextMatchPos = matchesPos + 1 < matches.length ? matchesPos + 1 : 0;
+      const nextMatch = matches[nextMatchPos];
       if (newMatches.length > 0) {
-        nextmatch.node.select(
-          nextmatch.index,
-          nextmatch.index + searchStr.length
+        nextMatch.node.select(
+          nextMatch.index,
+          nextMatch.index + searchStr.length
         );
         setTimeout(() => {
           scrollIntoSelection();
@@ -131,6 +133,8 @@ export function FindAndReplacePlugin() {
           );
         }
       }
+      setMatches([]);
+      setMatchesPos(0);
     });
   }
   function Find() {
@@ -146,7 +150,6 @@ export function FindAndReplacePlugin() {
       const regexStr = matchFullWordsOnly ? `\\b${searchStr}\\b` : searchStr;
       const regex = new RegExp(regexStr, flags);
       const newMatches = [];
-
       for (const node of nodes) {
         if ($isTextNode(node.node)) {
           const text = node.node.getTextContent();
@@ -250,26 +253,37 @@ export function FindAndReplacePlugin() {
                     </TextField>
                     <div className="ml-2 flex justify-between bg-gray-500">
                       <div className="flex gap-1">
-                        <TooltipButton
-                          tooltipMessage="Find"
-                          className="bg-green-500 text-white-500 hover:bg-green-400"
+                        <Button
+                          className="flex items-center bg-green-700 px-2 py-2 text-white-500 outline-none hover:bg-green-600"
                           onPress={Find}
                         >
                           Find
-                        </TooltipButton>
-                        <TooltipButton
-                          tooltipMessage="Previous occurence"
+                        </Button>
+                        <Button
+                          className={`$flex items-center px-2 py-2 outline-none data-[pressed]:bg-gray-700 ${
+                            disabled
+                              ? "[&>svg]:text-gray-300"
+                              : "hover:bg-gray-700"
+                          }  `}
+                          isDisabled={disabled}
+                          aria-label="Previous match"
                           onPress={prevMatch}
                         >
                           <FaArrowUp />
-                        </TooltipButton>
-                        <TooltipButton
-                          tooltipMessage="Next occurence"
+                        </Button>
+                        <Button
+                          className={`$flex items-center px-2 py-2 outline-none data-[pressed]:bg-gray-700 ${
+                            disabled
+                              ? "[&>svg]:text-gray-300"
+                              : "hover:bg-gray-700"
+                          }  `}
+                          isDisabled={disabled}
+                          aria-label="Next match"
                           onPress={nextMatch}
                         >
                           <FaArrowDown />
-                        </TooltipButton>
-                        <div className="my-auto flex h-full items-center bg-blue-500 px-1 text-white-500">
+                        </Button>
+                        <div className="my-auto flex h-full items-center bg-blue-800 px-1 text-white-500">
                           {matchesPos}/{matches.length}
                         </div>
                       </div>
@@ -288,20 +302,18 @@ export function FindAndReplacePlugin() {
                       <Input className="bg-gray-500 px-2 text-white-500 outline-none" />
                     </TextField>
                     <div className="flex gap-1">
-                      <TooltipButton
-                        tooltipMessage="Replace"
+                      <Button
                         onPress={ReplaceSelected}
-                        className="bg-green-500 text-white-500 hover:bg-green-400"
+                        className="flex items-center bg-green-700 px-2 py-2 text-white-500 outline-none hover:bg-green-600"
                       >
                         Replace Selected
-                      </TooltipButton>
-                      <TooltipButton
-                        className="bg-blue-500 text-white-500 hover:bg-blue-300"
-                        tooltipMessage="Replace All"
+                      </Button>
+                      <Button
+                        className="flex items-center bg-blue-800 px-2 py-2 text-white-500 outline-none hover:bg-blue-700"
                         onPress={ReplaceAll}
                       >
                         Replace All
-                      </TooltipButton>
+                      </Button>
                     </div>
                   </div>
                 </div>
