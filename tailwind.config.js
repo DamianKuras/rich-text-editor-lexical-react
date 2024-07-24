@@ -1,7 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
-  safelist: ["min-w-[8em]", "min-w-[4em]"],
+  safelist: ["min-w-[8em]", "min-w-[4em]","grid","grid-cols-2","grid-cols-3","grid-cols-4","grid-cols-5","grid-cols-6","gap-0","gap-1","gap-2","gap-3","gap-4","gap-5","gap-6"],
   theme: {
     fontFamily: {
       sans: ["ui-sans-serif", "system-ui"],

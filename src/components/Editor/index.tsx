@@ -24,6 +24,9 @@ import { ShowHtmlPlugin } from "./plugins/ShowHtmlPlugin";
 import LocalStorage from "./plugins/StoragePlugin/LocalStorage";
 import StoragePlugin from "./plugins/StoragePlugin/StoragePlugin";
 import { TextStatisticsPlugin } from "./plugins/TextStatisticsPlugin";
+import ColumnPlugin from "./plugins/ColumnPlugin";
+import { ColumnsContainerNode } from "./nodes/ColumnsContainerNode";
+import { ColumnNode } from "./nodes/ColumnNode";
 
 export type BlockType =
   | "paragraph"
@@ -55,6 +58,8 @@ export function Editor() {
       CodeHighlightNode,
       CodeNode,
       LinkNode,
+      ColumnsContainerNode,
+      ColumnNode,
     ],
   };
 
@@ -72,6 +77,7 @@ export function Editor() {
               </div>
               <StoragePlugin storage={storage} />
               <ToolbarPlugin />
+              <ColumnPlugin />
               <FindAndReplacePlugin />
               <TextStatisticsPlugin />
               <ShowHtmlPlugin />
