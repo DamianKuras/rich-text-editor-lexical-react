@@ -1,7 +1,7 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $dfs } from "@lexical/utils";
-import { $getRoot, $isTextNode, TextNode } from "lexical";
-import { useState } from "react";
+import { $getRoot, $isTextNode, $setSelection, TextNode } from "lexical";
+import { useCallback, useState } from "react";
 import {
   Button,
   Dialog,
@@ -21,19 +21,24 @@ import { VscChromeClose } from "react-icons/vsc";
 import { ToolbarSwitch } from "../ui/ToolbarSwitch";
 import { TooltipButton } from "../ui/TooltipButton";
 
+type Match = {
+  node: TextNode;
+  index: number;
+};
+
 export function FindAndReplacePlugin() {
   const [editor] = useLexicalComposerContext();
   const [searchStr, setSearchStr] = useState<string>("");
   const [replaceStr, setReplaceStr] = useState<string>("");
-  const [matchesPos, setMatchesPos] = useState(0);
-  const [matchCase, setMatchCase] = useState(false);
-  const [matchFullWordsOnly, setMatchFullWordsOnly] = useState(false);
-  const [matches, setMatches] = useState<{ node: TextNode; index: number }[]>(
-    []
-  );
-  const disabled = matches.length <= 2;
+  const [currentMatchIndex, setCurrentMatchIndex] = useState<number>(0);
+  const [matchCase, setMatchCase] = useState<boolean>(false);
+  const [matchFullWordsOnly, setMatchFullWordsOnly] = useState<boolean>(false);
+  const [matches, setMatches] = useState<Match[]>([]);
+  const [feedbackMessage, setFeedbackMessage] = useState<string>("");
 
-  function scrollIntoSelection() {
+  const isNavigationDisabled = matches.length < 2;
+
+  const scrollIntoSelection = useCallback(() => {
     const selection = window.getSelection();
     if (selection == null) {
       return;
@@ -60,41 +65,86 @@ export function FindAndReplacePlugin() {
         });
       }
     }
-  }
+  }, []);
 
-  function nextMatch() {
-    editor.update(() => {
-      const nextMatchPos = matchesPos + 1 < matches.length ? matchesPos + 1 : 0;
-      const match = matches[nextMatchPos];
-      match.node.select(match.index, match.index + searchStr.length);
-      setMatchesPos(nextMatchPos);
-    });
-    setTimeout(() => {
-      scrollIntoSelection();
-    }, 0);
-  }
-  function prevMatch() {
+  const nextMatch = useCallback(() => {
     editor.update(() => {
       const nextMatchPos =
-        matchesPos - 1 >= 0 ? matchesPos - 1 : matches.length - 1;
+        currentMatchIndex + 1 < matches.length ? currentMatchIndex + 1 : 0;
       const match = matches[nextMatchPos];
       match.node.select(match.index, match.index + searchStr.length);
-      setMatchesPos(nextMatchPos);
+      setCurrentMatchIndex(nextMatchPos);
     });
     setTimeout(() => {
       scrollIntoSelection();
     }, 0);
-  }
+  }, [
+    currentMatchIndex,
+    editor,
+    matches,
+    scrollIntoSelection,
+    searchStr.length,
+  ]);
 
-  function ReplaceSelected() {
+  const prevMatch = useCallback(() => {
     editor.update(() => {
-      const match = matches[matchesPos - 1];
+      const nextMatchPos =
+        currentMatchIndex - 1 >= 0 ? currentMatchIndex - 1 : matches.length - 1;
+      const match = matches[nextMatchPos];
+      match.node.select(match.index, match.index + searchStr.length);
+      setCurrentMatchIndex(nextMatchPos);
+    });
+    setTimeout(() => {
+      scrollIntoSelection();
+    }, 0);
+  }, [
+    currentMatchIndex,
+    editor,
+    matches,
+    scrollIntoSelection,
+    searchStr.length,
+  ]);
+
+  const findMatches = useCallback((): Match[] => {
+    if (searchStr === "") {
+      setMatches([]);
+      setCurrentMatchIndex(0);
+      return [];
+    }
+    const newMatches: Match[] = [];
+    editor.getEditorState().read(() => {
+      const root = $getRoot();
+      const nodes = $dfs(root);
+      const flags = matchCase ? "g" : "gi";
+      const regexStr = matchFullWordsOnly ? `\\b${searchStr}\\b` : searchStr;
+      const regex = new RegExp(regexStr, flags);
+
+      for (const node of nodes) {
+        if ($isTextNode(node.node)) {
+          const text = node.node.getTextContent();
+          let result;
+          while ((result = regex.exec(text)))
+            newMatches.push({ node: node.node, index: result.index });
+        }
+      }
+    });
+    return newMatches;
+  }, [editor, searchStr, matchCase, matchFullWordsOnly]);
+
+  const replaceSelected = useCallback(() => {
+    if (matches.length == 0) {
+      setFeedbackMessage("No match selected to replace");
+      return;
+    }
+    editor.update(() => {
+      const match = matches[currentMatchIndex];
       const nodeTextContent = match.node.getTextContent();
       const updatedNodeTextContent =
         nodeTextContent.substring(0, match.index) +
         replaceStr +
         nodeTextContent.substring(match.index + searchStr.length);
       match.node.setTextContent(updatedNodeTextContent);
+
       const newMatches = matches
         .filter((item) => item != match)
         .map((item) => {
@@ -107,76 +157,93 @@ export function FindAndReplacePlugin() {
           return item;
         });
       setMatches(newMatches);
-      const nextMatchPos = matchesPos + 1 < matches.length ? matchesPos + 1 : 0;
-      const nextMatch = matches[nextMatchPos];
+      let newMatchIndex = currentMatchIndex;
       if (newMatches.length > 0) {
+        //navigate to match after removed one
+        if (newMatchIndex >= newMatches.length) {
+          newMatchIndex = 0;
+        }
+        const nextMatch = newMatches[newMatchIndex];
         nextMatch.node.select(
           nextMatch.index,
           nextMatch.index + searchStr.length
         );
+        setCurrentMatchIndex(newMatchIndex);
         setTimeout(() => {
           scrollIntoSelection();
         }, 0);
       } else {
-        setMatchesPos(0);
+        setCurrentMatchIndex(0);
+        match.node.select();
       }
     });
-  }
+  }, [
+    editor,
+    matches,
+    currentMatchIndex,
+    searchStr,
+    replaceStr,
+    scrollIntoSelection,
+  ]);
 
-  function ReplaceAll() {
-    editor.update(() => {
-      Find();
-      if (matches.length > 0) {
-        for (const match of matches) {
-          match.node.setTextContent(
-            match.node.getTextContent().replace(searchStr, replaceStr)
-          );
-        }
-      }
-      setMatches([]);
-      setMatchesPos(0);
-    });
-  }
-  function Find() {
-    if (searchStr === "") {
-      setMatches([]);
-      setMatchesPos(0);
+  const ReplaceAll = useCallback(() => {
+    const newMatches = findMatches();
+    if (newMatches.length == 0) {
+      setFeedbackMessage("No matches found");
       return;
     }
     editor.update(() => {
-      const root = $getRoot();
-      const nodes = $dfs(root);
-      const flags = matchCase ? "g" : "gi";
-      const regexStr = matchFullWordsOnly ? `\\b${searchStr}\\b` : searchStr;
-      const regex = new RegExp(regexStr, flags);
-      const newMatches = [];
-      for (const node of nodes) {
-        if ($isTextNode(node.node)) {
-          const text = node.node.getTextContent();
-          let result;
-          while ((result = regex.exec(text)))
-            newMatches.push({ node: node.node, index: result.index });
-        }
-      }
-      if (newMatches.length > 0) {
-        newMatches[0].node.select(
-          newMatches[0].index,
-          newMatches[0].index + searchStr.length
+      for (const match of newMatches) {
+        match.node.setTextContent(
+          match.node.getTextContent().replace(searchStr, replaceStr)
         );
-        setMatches(newMatches);
-        setMatchesPos(1);
-        setTimeout(() => {
-          scrollIntoSelection();
-        }, 0);
-      } else {
-        setMatchesPos(0);
-        setMatches([]);
       }
+      setMatches([]);
+      setCurrentMatchIndex(0);
+      $setSelection(null);
+      setFeedbackMessage("");
     });
-  }
+  }, [editor, searchStr, replaceStr, findMatches]);
+
+  const handleFind = useCallback(() => {
+    const newMatches = findMatches();
+    setMatches(newMatches);
+
+    if (searchStr === "") {
+      setFeedbackMessage(
+        "Please enter at least one character in the search box"
+      );
+      return;
+    }
+
+    if (newMatches.length == 0) {
+      setFeedbackMessage("No matches found");
+      return;
+    }
+
+    editor.update(() => {
+      const firstMatch = newMatches[0];
+      firstMatch.node.select(
+        firstMatch.index,
+        firstMatch.index + searchStr.length
+      );
+      setCurrentMatchIndex(0);
+      setFeedbackMessage("");
+    });
+
+    setTimeout(() => {
+      scrollIntoSelection();
+    }, 0);
+  }, [findMatches, editor, searchStr, scrollIntoSelection]);
+
+  const handleClose = useCallback(() => {
+    setMatches([]);
+    setCurrentMatchIndex(0);
+    setFeedbackMessage("");
+  }, []);
 
   return (
-    <DialogTrigger>
+    <DialogTrigger onOpenChange={handleClose}>
       <TooltipButton tooltipMessage="Find and replace">
         <MdOutlineFindReplace size="20" />
       </TooltipButton>
@@ -238,7 +305,11 @@ export function FindAndReplacePlugin() {
                     </TooltipButton>
                   </div>
                 </div>
+
                 <div className="bg-gray-900 px-8 py-8 shadow-lg">
+                  {feedbackMessage && (
+                    <div className="mb-4 text-red-500">{feedbackMessage}</div>
+                  )}
                   <div className="mb-4 flex">
                     <TextField
                       autoFocus
@@ -255,17 +326,17 @@ export function FindAndReplacePlugin() {
                       <div className="flex gap-1">
                         <Button
                           className="flex items-center bg-green-700 px-2 py-2 text-white-500 outline-none hover:bg-green-600"
-                          onPress={Find}
+                          onPress={handleFind}
                         >
                           Find
                         </Button>
                         <Button
                           className={`$flex items-center px-2 py-2 outline-none data-[pressed]:bg-gray-700 ${
-                            disabled
+                            isNavigationDisabled
                               ? "[&>svg]:text-gray-300"
                               : "hover:bg-gray-700"
                           }  `}
-                          isDisabled={disabled}
+                          isDisabled={isNavigationDisabled}
                           aria-label="Previous match"
                           onPress={prevMatch}
                         >
@@ -273,18 +344,19 @@ export function FindAndReplacePlugin() {
                         </Button>
                         <Button
                           className={`$flex items-center px-2 py-2 outline-none data-[pressed]:bg-gray-700 ${
-                            disabled
+                            isNavigationDisabled
                               ? "[&>svg]:text-gray-300"
                               : "hover:bg-gray-700"
                           }  `}
-                          isDisabled={disabled}
+                          isDisabled={isNavigationDisabled}
                           aria-label="Next match"
                           onPress={nextMatch}
                         >
                           <FaArrowDown />
                         </Button>
                         <div className="my-auto flex h-full items-center bg-blue-800 px-1 text-white-500">
-                          {matchesPos}/{matches.length}
+                          {currentMatchIndex + (matches.length > 0 ? 1 : 0)}/
+                          {matches.length}
                         </div>
                       </div>
                     </div>
@@ -303,7 +375,7 @@ export function FindAndReplacePlugin() {
                     </TextField>
                     <div className="flex gap-1">
                       <Button
-                        onPress={ReplaceSelected}
+                        onPress={replaceSelected}
                         className="flex items-center bg-green-700 px-2 py-2 text-white-500 outline-none hover:bg-green-600"
                       >
                         Replace Selected
